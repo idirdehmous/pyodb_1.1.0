@@ -34,7 +34,7 @@ So on ATOS  : <br />
 
    ```  
         STEP 0 - download the source  code:
-        wget   https://github.com/idirdehmous/pyodb_0.1.0/releases/download/1.1.0/pyodb_1.1.0.tar.gz 
+        wget   https://github.com/idirdehmous/pyodb_1.1.0/releases/download/1.1.0/pyodb_1.1.0.tar.gz 
         tar -xvf  pyodb_1.1.0.tar.gz
  
         STEP 1 - FIRST, CREATE A BUILD DIRECORY TO INSTALL THE ODB LIBRARIES.

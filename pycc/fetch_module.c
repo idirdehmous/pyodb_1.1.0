@@ -18,6 +18,18 @@ extern double util_walltime_();
 // --> DEBUG ON/OFF 
 
 
+
+
+void redirect () {
+//    printf("This is a message to stdout\n");
+    fflush(stdout);
+    
+//    fprintf(stderr, "This is a message to stderr\n");
+    fflush(stderr);
+}
+
+
+
 static PyObject *odbFetch_method( PyObject* Py_UNUSED(self)  , PyObject*  args, PyObject* Py_UNUSED( kwargs )) {
     
     char *database   = NULL ;
@@ -232,6 +244,7 @@ if ( verbose  )   {
   //   }
      //PyObject* cnt = reset_counter ( &num_rows  ) ; 
 
+     redirect ()  ; 
      return    py_row   ;
 }
 

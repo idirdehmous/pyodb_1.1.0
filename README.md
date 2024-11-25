@@ -109,7 +109,7 @@ General info        <br />
 Used languages      : C / python /Fortran  <br />
 Needs installation  : YES                  <br />
 Needs compilation   : YES                  <br />
-Tested with ODB(s)  : RMI ,CHMZ , MetCoOp and CHMI  <br />
+Tested with ODB(s)  : RMI ,CHMZ , MetCoOp and CHMI and ARPEGE  <br />
 Handled observations: Conventional, GNSS , Radar , Satallite observations ( IASI, MHS AMSUA/B etc ) <br />
 
 Some limitations    <br />

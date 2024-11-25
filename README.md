@@ -21,7 +21,7 @@ Some modifictions have been done to make it compatible with C/Python API ( 3.8 -
 ## Dependencies :
         gcc compiler  = 13.2.0    
         cmake        >= 3.15.0   
-        3.8.0  <=   python   <= 3.11  
+        3.8.0  <=   python   <= 3.10  (NEEDS SOME READAPTATION FOR python3.11.x, 3.12.x,3.13.x )
 
 ==> It has been widely developed and tested on ATOS. <br />
 So on ATOS  : <br />

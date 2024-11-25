@@ -53,7 +53,8 @@ REMARK:  <br />
 
 ```
         STEP 2 - cd  /path/to/source/of/.../pyodb_1.1.0  
-              python  setup.py   build  
+              python  setup.py   build 
+!!Mandatory!: Remove the build directory if any build command is needed ! 
               ** FOR STANDARD INSTALLATION : 
                 sudo  python  setup.py   install  
 

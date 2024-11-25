@@ -163,7 +163,7 @@ init_IOs()
       
       if (io_profile) Profile_newio32_init(newio_myproc); 
 
-      if (newio_myproc == 1) {
+    /*  if (newio_myproc == 1) {
 	FILE *fp  ; 
 	fp = fopen("pyodb.stdout"  ,  "w");
 	fprintf(fp,"*** %s:init_IOs() ***\n",__FILE__);
@@ -184,7 +184,31 @@ init_IOs()
 	}
 	fprintf(fp,"\t          ODB_IO_LOCK=%d\n",io_lock);
 	fprintf(fp,"*********************\n");
+      }  */
+
+      if (newio_myproc == 1) {
+        //FILE *fp  ; 
+        //fp = fopen("pyodb.stdout"  ,  "w");
+        printf("*** %s:init_IOs() ***\n",__FILE__);
+        printf("\tODB_WRITE_EMPTY_FILES=%d\n",io_write_empty_files);
+        printf("\t  ODB_CONSIDER_TABLES=%s\n",consider_tables);
+        printf("\t   ODB_IO_KEEP_INCORE=%d\n",io_keep_incore);
+        printf("\t      ODB_IO_FILESIZE=%d MB\n",io_filesize);
+        printf("\t       ODB_IO_BUFSIZE=%d bytes\n",io_bufsize);
+        printf("\t       ODB_IO_GRPSIZE=%d (or max no. of pools)\n",io_grpsize);
+        printf("\t       ODB_IO_PROFILE=%d\n",io_profile);
+        printf("\t       ODB_IO_VERBOSE=%d\n",io_verbose);
+        printf("\t        ODB_IO_METHOD=%d\n",io_method);
+        if (version_env) {
+          printf("\t          ODB_VERSION=%s (environment variable)\n",version_env);
+        }
+        if (version_sw) {
+          printf("\t          ODB_VERSION=%s (software release)\n",version_sw);
+        }
+        printf("\t          ODB_IO_LOCK=%d\n",io_lock);
+        printf("*********************\n");
       }
+
       first_time = 0;
     } /* if (first_time) 2nd */
     coml_unset_lockid_(&NEWIO_mylock);

@@ -1,9 +1,10 @@
 #define PY_SSIZE_T_CLEAN
 #include  <stdio.h> 	
-#include  "Python.h"
 #include  "odbdump.h"
-
 #define SMAX 50 
+
+
+
 
 
 // Formatting floats
@@ -60,7 +61,6 @@ str_len=0   ;
 
 return str_len ;
 }
-
 
 
 //extern void pprint ( const char *  string ) {   }

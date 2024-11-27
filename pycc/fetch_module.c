@@ -7,7 +7,9 @@
 #include <Python.h>
 #include <unistd.h>
 #include "odbdump.h"
-//#include "pyspam.h"
+#include "rows.h" 
+#include "progress.h"
+
 
 
 /* ENDIANESS */
@@ -17,16 +19,6 @@ extern double util_walltime_();
 // TODo 
 // --> DEBUG ON/OFF 
 
-
-
-
-void redirect () {
-//    printf("This is a message to stdout\n");
-    fflush(stdout);
-    
-//    fprintf(stderr, "This is a message to stderr\n");
-    fflush(stderr);
-}
 
 
 
@@ -48,10 +40,12 @@ static PyObject *odbFetch_method( PyObject* Py_UNUSED(self)  , PyObject*  args, 
     PyObject *ttm; 
     PyObject *int4; 
     PyObject *fl;
+    PyObject* pbar     ; 
     PyObject* bool_arg1 ;
     PyObject* bool_arg2 ;
     Bool verbose        ;
     Bool header         ;
+    Bool lpbar          ;
 
 //static char *kwlist[] = {"database" , "sql_query" , "ncols" , "queryfile"};
 //if (!PyArg_ParseTupleAndKeywords( kwargs, "ssi|z", kwlist, PyUnicode_FSConverter, &database , &sql_query ,&ncols,  &queryfile))
@@ -59,12 +53,13 @@ static PyObject *odbFetch_method( PyObject* Py_UNUSED(self)  , PyObject*  args, 
 //return NULL;
 //}
 
-if (!PyArg_ParseTuple (args , "ssi|zzzOO" ,&database  , 
+if (!PyArg_ParseTuple (args , "ssi|zzzOOO" ,&database  , 
                                          &sql_query , 
 					 &fcols     ,
 					 &queryfile , 
 					 &poolmask  , 
           				 &fmt_float ,
+					 &pbar     , 
 					 &bool_arg1  , 
          				 &bool_arg2  
 					   ) )
@@ -74,8 +69,10 @@ if (!PyArg_ParseTuple (args , "ssi|zzzOO" ,&database  ,
 
 
 //  boolean variables conversion 
+    lpbar    = PyObject_IsTrue(pbar  );
     verbose  = PyObject_IsTrue(bool_arg1);
     header   = PyObject_IsTrue(bool_arg2) ;
+
 
 if ( verbose  )   {
   if (poolmask ) {
@@ -94,12 +91,19 @@ if ( verbose  )   {
 
   char* delim=NULL ; 
   if (!delim) delim = STRDUP(" ");
-  //double wlast;
   extern int optind;
+
+
+  size_t ip   =0;
+  size_t prog_max = 0  ;
+
  
+  if ( lpbar  ) {
+   int  total_rows =getMaxrows(database, sql_query , fcols   )  ; 
+   prog_max = (size_t) total_rows ; 
+  }
 
   if (maxlines == 0) return PyLong_FromLong(rc );
-
   if ( verbose ) {
    if ( sql_query  ) {
    printf ( "Executing query from string : %s\n" , sql_query ) ; 
@@ -136,7 +140,13 @@ if ( verbose  )   {
     int dlen = packed ? maxcols * sizeof(*d) :(unsigned int) maxcols;
 
     ALLOCX(d, maxcols);
+
     while ( (nd = nextrow(h, d, dlen, &new_dataset)) > 0) {	    
+
+      if ( pbar  ) {
+      ip=ip+1 ; 
+      print_progress(ip  , prog_max  );
+      }
       Py_ssize_t i ;
       PyObject*  py_col    = PyList_New(maxcols-fcols) ;
 
@@ -244,7 +254,6 @@ if ( verbose  )   {
   //   }
      //PyObject* cnt = reset_counter ( &num_rows  ) ; 
 
-     redirect ()  ; 
      return    py_row   ;
 }
 

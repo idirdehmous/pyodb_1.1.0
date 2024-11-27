@@ -15,7 +15,7 @@ __version__="1.1.0"
 extra_compile_args = sysconfig.get_config_var('CFLAGS').split()
 extra_compile_args += [ "-fPIC" ,"-Wall", "-Wextra", 
                         "-Wsign-compare","-Waddress",
-                        "-Wunused-variable"]
+                        "-Wunused-variable","-Wunused-variable"]
 # EXTENSION SUFFIX 
 sfx  =  sysconfig.get_config_var('EXT_SUFFIX')
 

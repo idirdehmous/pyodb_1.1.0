@@ -16,6 +16,11 @@ extra_compile_args = sysconfig.get_config_var('CFLAGS').split()
 extra_compile_args += [ "-fPIC" ,"-Wall", "-Wextra", 
                         "-Wsign-compare","-Waddress",
                         "-Wunused-variable","-Wunused-variable"]
+
+
+#extra_link_args=sysconfig.get_config_var ('LDFLAGS' )
+#extra_link_args+= ' -lgopenmp' 
+
 # EXTENSION SUFFIX 
 sfx  =  sysconfig.get_config_var('EXT_SUFFIX')
 
@@ -76,6 +81,7 @@ class BuildModule:
                   include_dirs =[ self.inc ],
                   extra_objects=[ self.lib ], 
                   extra_compile_args=extra_compile_args,
+        #          extra_link_args=   extra_link_args , 
                   language     =self.language )
         return m  
 

@@ -1,10 +1,10 @@
 #define PY_SSIZE_T_CLEAN
 #include "pyspam.h"
-#include "io_module.c"
-#include "info_module.c"
-#include "fetch_module.c"
-#include "dca_module.c"
-#include "gcdist.c"
+#include "io_module.h"
+#include "info_module.h"
+#include "fetch_module.h"
+#include "dca_module.h"
+#include "gcdist.h"
 
 static PyMethodDef module_methods[] = {
     {"odbConnect",  (PyCFunction)(void(*)(void))    odbConnect_method ,

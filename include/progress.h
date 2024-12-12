@@ -13,15 +13,16 @@
 
 
 
-
-
-
-//void my_wait(){   usleep(100000);  }
-
 //Compute the percentage
 int     calculate_percentage(int count, int max) {
-        int    pp=    ((float)count / max )* 100 ; 
+
+	int pp= 0; 
+	if (  max != 0 ) {
+        pp=    ((float)count / max )* 100 ; 
+	}
+
         return pp  ;  
+	
 }
 
 
@@ -37,6 +38,8 @@ void print_progress(size_t count, size_t max )
 	for ( ii=0 ; ii < MAX_LENGTH ; ++ii)	{		
 		buffer[prefix_length + ii] = ii <(int) PERCENTAGE(count, max) ? '#' : ' ';
 	}
+
+
 
 	if ( count  <max   ) {
         int  pp  =calculate_percentage( count ,  max)  ; 
@@ -68,18 +71,4 @@ void print_progress(size_t count, size_t max )
 	free(buffer);
 }
 
-
-/*int  main()
-{
-	size_t num_secs = 1, max_secs = NUM_SECS;
-	printf("%s\n", "");
-	print_progress(0, max_secs  );
-	for (; num_secs <= max_secs; ++num_secs)
-	{
-        int pp=  calculate_percentage ( num_secs,    max_secs   ) ; 
-		my_wait(1);
-		print_progress(num_secs, max_secs );
-	}
-	return 0;
-}*/
 

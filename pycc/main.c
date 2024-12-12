@@ -1,14 +1,10 @@
 #define PY_SSIZE_T_CLEAN
 #include "pyspam.h"
-#include "io_module.h"
-#include "info_module.h"
-#include "fetch_module.h"
-#include "dca_module.h"
-
-
-
-
-
+#include "io_module.c"
+#include "info_module.c"
+#include "fetch_module.c"
+#include "dca_module.c"
+#include "gcdist.c"
 
 static PyMethodDef module_methods[] = {
     {"odbConnect",  (PyCFunction)(void(*)(void))    odbConnect_method ,
@@ -25,6 +21,8 @@ static PyMethodDef module_methods[] = {
      METH_VARARGS | METH_KEYWORDS,   "Fetch rows from  a given ECMA or CCMA  ODB database given sql query "},
     {"odbDca"  ,  (PyCFunction)(void(*)(void))      odbDca_method   ,
      METH_VARARGS | METH_KEYWORDS,   "Create DCA (Direct Column  Access )   files "},
+    {"gcDist",  (PyCFunction)(void(*)(void))      gcMatrix_method  ,
+     METH_VARARGS | METH_KEYWORDS,   "Compute the distances between 2 sets of N (lon,lat) points , returns a 2D  matrix (NxN) "},
 
 };
 

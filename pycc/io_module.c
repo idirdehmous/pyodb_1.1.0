@@ -4,11 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Python.h>
-//#include "odbdump.h"
+#include "odbdump.h"
 #include "magicwords.h"
 #include "info.h"
 #include "odb.h"
 #include "privpub.h"
+#include "pyspam.h"
 #include "macros.h"
 #include "iostuff.h"
 
@@ -31,6 +32,8 @@ ODBc_get_free_handles(int *Maxhandle)
 
 
 static PUBLIC   PyObject*   odbConnect_method ( PyObject *Py_UNUSED(self) , PyObject* args ,  PyObject *kwargs)  {
+	Py_Initialize() ;
+        //char* odbdir = NULL ;  
 	char *dbname =NULL  ; 
         char *mode   =NULL  ;
         int  *npools =NULL  ;
@@ -55,6 +58,7 @@ static PUBLIC   PyObject*   odbConnect_method ( PyObject *Py_UNUSED(self) , PyOb
        {
         return NULL;
        }
+  printf ( "%s\n" , dbname ) ; 
   Bool error = false;
   int handle = -1 ; 
   
@@ -250,7 +254,7 @@ static PUBLIC   PyObject*   odbConnect_method ( PyObject *Py_UNUSED(self) , PyOb
 
       cma_open_(&iounit, p_dbname , "r", &iret, strlen(p_dbname), 1);
 
-      //printf ( "%d    %d\n" , iret, iounit ) ; 
+      printf ( "%d    %d\n" , iret, iounit ) ; 
       if (iret >= 1) {
 	FILE *fp = CMA_get_fp(&iounit);
 	codb_read_metadata_(&handle,
@@ -296,9 +300,9 @@ static PUBLIC   PyObject*   odbConnect_method ( PyObject *Py_UNUSED(self) , PyOb
   
   if (error && handle >= 1) {
        handle = ODBc_close(handle);
-  return PyLong_FromLong(  0 );
+  return PyLong_FromLong( 1 );
   } else {
-  return PyLong_FromLong(  1 );
+  return PyLong_FromLong( 0 );
   }
   //cma_close_(&iounit, &iret);
  
@@ -318,6 +322,7 @@ static PUBLIC   PyObject*   odbClose_method (PyObject *Py_UNUSED(self), PyObject
  //   }
 
   //if ( handle == 0 )  { handle =1 ;  }  ;   // Means that odbConnect returned 0 in python call (Success !)
+  int  rc = -1 ;
 
   if (free_handles && handle >= 1 && handle <= maxhandle) {
     DB_t *ph = &free_handles[handle-1];
@@ -334,21 +339,50 @@ static PUBLIC   PyObject*   odbClose_method (PyObject *Py_UNUSED(self), PyObject
         FREE(ph->tblname);
       }
       ph->tblname = NULL;
-  
       if ( verbose != NULL ) {
 	 printf( "--ODB %s has been closed\n.",  ph->dbname    ) ; 
-         return PyLong_FromLong( 0 )   ; /* ok */
-      }
-      else 
-      {   
-	    
-	 return PyLong_FromLong(1) ; 
-      } ; 
+         rc = 0   ; /* ok */
+      }else {   rc =0 ; } ; 
       
-      }
-
     }
-  return PyLong_FromLong(0) ;
+  }
+  //return  PyLong_FromLong(rc) ;
+  Py_Finalize () ; 
+  //Py_DECREF (rc) ; 
+
 }
 
+static PyMethodDef module_methods[] = {
+    {"odbConnect",  (PyCFunction)(void(*)(void))   odbConnect_method ,
+     METH_VARARGS | METH_KEYWORDS,   "Create odb connection   "},
+    {"odbClose"  ,  (PyCFunction)(void(*)(void))    odbClose_method  ,
+     METH_VARARGS | METH_KEYWORDS,   "Close an opened ODB "},
+
+
+};
+
+
+// Modules definition
+static struct PyModuleDef   odbmodule = {
+    PyModuleDef_HEAD_INIT,
+    "pyodb_io",
+    "C/Python interface for ODB I/O  connection , close !",
+    -1,
+    module_methods ,
+     .m_slots =NULL
+};
+
+
+// Called first during python call
+PyMODINIT_FUNC PyInit_pyodb_io (void) {
+    PyObject*  m  ;
+    PyObject* ModuleError ;  
+    m=PyModule_Create(&odbmodule);
+    if ( m == NULL) {
+        ModuleError = PyErr_NewException("Failed to create the module : pyodb_io", NULL, NULL);
+        Py_XINCREF(ModuleError) ;
+        return NULL;
+}
+    return m  ; 
+}
 

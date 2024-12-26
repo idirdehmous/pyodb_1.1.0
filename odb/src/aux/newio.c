@@ -96,6 +96,7 @@ static o_lock_t NEWIO_mylock = 0; /* A specific OMP-lock; initialized only once 
 PRIVATE char *version_env = NULL; 
 PRIVATE char *version_sw = NULL; 
 
+
 PRIVATE void
 init_IOs()
 {
@@ -189,6 +190,7 @@ init_IOs()
       if (newio_myproc == 1) {
         //FILE *fp  ; 
         //fp = fopen("pyodb.stdout"  ,  "w");
+	printf("********%s*******" , " New ODB I/O opened with the following environment  \n")  ;
         printf("*** %s:init_IOs() ***\n",__FILE__);
         printf("\tODB_WRITE_EMPTY_FILES=%d\n",io_write_empty_files);
         printf("\t  ODB_CONSIDER_TABLES=%s\n",consider_tables);
@@ -199,14 +201,14 @@ init_IOs()
         printf("\t       ODB_IO_PROFILE=%d\n",io_profile);
         printf("\t       ODB_IO_VERBOSE=%d\n",io_verbose);
         printf("\t        ODB_IO_METHOD=%d\n",io_method);
-        if (version_env) {
-          printf("\t          ODB_VERSION=%s (environment variable)\n",version_env);
-        }
-        if (version_sw) {
-          printf("\t          ODB_VERSION=%s (software release)\n",version_sw);
-        }
-        printf("\t          ODB_IO_LOCK=%d\n",io_lock);
-        printf("*********************\n");
+        //if (version_env) {
+        //  printf("\t          ODB_VERSION=%s (environment variable)\n",version_env);
+       // }
+       // if (version_sw) {
+       //   printf("\t          ODB_VERSION=%s (software release)\n",version_sw);
+       // }
+       // printf("\t          ODB_IO_LOCK=%d\n",io_lock);
+       // printf("*********************\n");
       }
 
       first_time = 0;

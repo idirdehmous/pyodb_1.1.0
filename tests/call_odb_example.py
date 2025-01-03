@@ -5,7 +5,7 @@ import ctypes
 from   ctypes import cdll , CDLL
 from   ctypes.util import find_library 
 import argparse 
-
+sys.path.insert( 0,   "/mnt/HDS_ALD_TEAM/ALD_TEAM/idehmous/hpca_backup/pyodb_releases/pyodb_1.1.0/build/lib.linux-x86_64-cpython-39" )
 
 # python  MODULES 
 from pyodb_extra.odb_glossary import  OdbLexic
@@ -85,12 +85,13 @@ sql    =p.CleanString ( sql_query  )   # Check and clean before sending !
 nfunctions=nfunc    # (type == integer )Number of columns considring the functions in the sql statement  (degrees, rad, avg etc ...)
 query_file=None     # (type == str     )The sql file if used rather than sql request string 
 pool      =None     # (type == str     )The pool number (  must be a string  "2", "33"   , etc   )
+progress  =False  
 float_fmt =None     # (type == str     )Number of digits for floats (same syntax  as in C  )
 verbose   =True     # (type == bool    )Verbosity 
 header    =True     # (type == bool    )Get the columns names 
 
 
-rows =odbFetch(dbpath ,sql, nfunctions ,query_file, pool,float_fmt ,verbose, header)
+rows =odbFetch(dbpath ,sql, nfunctions ,query_file, pool,float_fmt , progress   , verbose, header)
 for row in rows :
     print( row  )
 

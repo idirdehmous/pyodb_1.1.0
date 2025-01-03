@@ -98,7 +98,7 @@ if ( verbose  )   {
   size_t prog_max = 0  ;
 
  
-  if ( lpbar  ) {
+  if ( lpbar  == 1 ) {
    int  total_rows =getMaxrows(database, sql_query , fcols   )  ; 
    prog_max = (size_t) total_rows ; 
   }
@@ -143,7 +143,7 @@ if ( verbose  )   {
 
     while ( (nd = nextrow(h, d, dlen, &new_dataset)) > 0) {	    
 
-      if ( pbar  ) {
+      if ( lpbar  == 1 ) {
       ip=ip+1 ; 
       print_progress(ip  , prog_max  );
       }

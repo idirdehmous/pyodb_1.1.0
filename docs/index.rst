@@ -1,17 +1,10 @@
-.. obstool documentation master file, created by
-   sphinx-quickstart on Thu Dec 26 15:40:19 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-obstool documentation
+pyodb documentation 
 =====================
+This is the BETA release 1.1.0 of pyodb.
+An interface written in C/Python API to access the  `ECMWF ODB <https://example.com>`_ databases.
+Its aim is to access the ODB tables/columns data and meta data using a direct SQL request embadded in python scripts.
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+The main source code is written in pure C and the routines handling the ODB1 format has been 'pruned' from ECMWF ODB_API bundle-0.18.1 to build only the needed libraries
 
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
+Reference: The original C code has been developed by "Sami Saarinen et al" at ECMWF from 1998 --> 2008.
+Some modifictions have been done to make it compatible with C/Python API ( 3.8 ---> 3.10 ).

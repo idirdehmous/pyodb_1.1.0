@@ -30,10 +30,12 @@ Some modifictions have been done to make it compatible with C/Python API ( 3.8 -
    module load   python3/3.10.10-01   <br />
    module load   cmake/3.25.2         <br />
 
+
+
    On belenos : <br />
-   module load  gcc/14.1.0            <br />
-   module load  python/3.10.12        <br />
-   module load  cmake/3.24.1          <br />
+   module load  gcc/9.2.0     (Got bugs with higher on belenos )    <br />
+   module load  python/3.10.12                           <br />
+   module load  cmake/3.24.1                             <br />
 
 
 

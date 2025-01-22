@@ -5,7 +5,7 @@ import ctypes
 from   ctypes import cdll , CDLL
 from   ctypes.util import find_library 
 import argparse 
-sys.path.insert( 0,   "/mnt/HDS_ALD_TEAM/ALD_TEAM/idehmous/hpca_backup/pyodb_releases/pyodb_1.1.0/build/lib.linux-x86_64-cpython-39" )
+sys.path.insert( 0,   "/mnt/HDS_ALD_TEAM/ALD_TEAM/idehmous/test/pyodb_1.1.0/build/lib.linux-x86_64-cpython-39" )
 
 # python  MODULES 
 from pyodb_extra.odb_glossary import  OdbLexic
@@ -32,9 +32,10 @@ else :
 
 # WHERE libodb.so  is installed  ? 
 odb_install_dir=os.getenv( "ODB_INSTALL_DIR" )
+
 if odb_install_dir== None:
    # SET THE PATH EXPLICITY 
-   odb_install_dir="/hpcperm/cvah/odb/odb_env"
+   odb_install_dir="/mnt/HDS_ALD_TEAM/ALD_TEAM/idehmous/test"
 
 
 # INIT ENV 
@@ -69,29 +70,30 @@ if iret < 0 :
    sys.exit(0)
 
 
-# SQL QUERY 
-sql_query="select seqno, date,time, varno ,lat, lon , obsvalue from hdr,body"
+# SIMPLE SQL QUERY (lat,lon,obsvalue )
+sql_query="select seqno, date,time, varno ,degrees(lat), degrees(lon) , obsvalue from hdr,body"
 
 # CHECK THE query 
 p      =StringParser()
 nfunc  =p.ParseTokens ( sql_query )    # Parse sql statement and get the number of functions  
 sql    =p.CleanString ( sql_query  )   # Check and clean before sending !
 
-#sqlfile="sql/ccma_view.sql"
 
 # THE METHOD COULD BE CALLED WITH sql QUERY or  sql file  (ONE IS MANDATORY !)
 # The arguments are positional , should be replaced by keyword args 
 # args :
 nfunctions=nfunc    # (type == integer )Number of columns considring the functions in the sql statement  (degrees, rad, avg etc ...)
 query_file=None     # (type == str     )The sql file if used rather than sql request string 
-pool      =None     # (type == str     )The pool number (  must be a string  "2", "33"   , etc   )
-progress  =False  
+pool      =None     # (type == str     )The pool number (  must be a string  "1" , "2", "33" ...  , etc   )
+progress  =True     # (type == bool    )Progress bar (we need to see what happends in the case of "huge " ODBs)
 float_fmt =None     # (type == str     )Number of digits for floats (same syntax  as in C  )
-verbose   =True     # (type == bool    )Verbosity 
+verbose   =True     # (type == bool    )Verbosity   
 header    =True     # (type == bool    )Get the columns names 
 
 
 rows =odbFetch(dbpath ,sql, nfunctions ,query_file, pool,float_fmt , progress   , verbose, header)
+
+# HERE YOU CAN HANDLE YOU DATA !
 for row in rows :
     print( row  )
 

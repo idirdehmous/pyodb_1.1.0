@@ -4,8 +4,6 @@ import sys
 import ctypes 
 from   ctypes import cdll , CDLL
 from   ctypes.util import find_library 
-import argparse 
-sys.path.insert( 0,   "/mnt/HDS_ALD_TEAM/ALD_TEAM/idehmous/test/pyodb_1.1.0/build/lib.linux-x86_64-cpython-39" )
 
 # python  MODULES 
 from pyodb_extra.odb_glossary import  OdbLexic
@@ -57,11 +55,13 @@ db_name = db_attr["name"]
 
 
 
+# Direct Column Access files 
 # CREATE DCA IF THEY ARN'T ALREADY THERE 
-# ALWAYS EXPORT IOASSIGN FILE , OTHERWISE dcagen WILL CRASH WITOUT FINISHING !!!!!
+# ALWAYS EXPORT IOASSIGN FILE , OTHERWISE dcagen WILL CRASH WITOUT FINISHING !!!
 if not os.path.isdir (dbpath+"/dca"):
    os.environ["IOASSIGN "]           =dbpath+"/IOASSIGN"
    ic=odbDca ( dbpath=dbpath, db= db_type, ncpu=8  )
+
 
 # CONNECT 
 iret  = odbConnect ( odbdir=dbpath+"/"+db_name  , mode="r")
@@ -75,12 +75,12 @@ sql_query="select seqno, date,time, varno ,degrees(lat), degrees(lon) , obsvalue
 
 # CHECK THE query 
 p      =StringParser()
-nfunc  =p.ParseTokens ( sql_query )    # Parse sql statement and get the number of functions  
+nfunc  =p.ParseTokens ( sql_query )    # Parse sql statement and get the number of functions  ( In C code , N pure columns = N All columns - N functions in sql query)
 sql    =p.CleanString ( sql_query  )   # Check and clean before sending !
 
 
 # THE METHOD COULD BE CALLED WITH sql QUERY or  sql file  (ONE IS MANDATORY !)
-# The arguments are positional , should be replaced by keyword args 
+# The arguments are positional ( THE ORDER MUST BE RESPECETD )
 # args :
 nfunctions=nfunc    # (type == integer )Number of columns considring the functions in the sql statement  (degrees, rad, avg etc ...)
 query_file=None     # (type == str     )The sql file if used rather than sql request string 
@@ -98,3 +98,5 @@ for row in rows :
     print( row  )
 
 
+
+# This script shows a first usage of pyodb  , a complete doc will be available in the future !

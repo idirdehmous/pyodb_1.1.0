@@ -305,10 +305,10 @@ return PyLong_FromLong(0) ;
 
 
 
-/*static PyObject* odbSchema_method (  ){
+static PyObject* odbSchema_method ( PyObject* self , PyObject* args , PyObject* kwargs  ){
 
 //      1  desc
-//      2  +---> poolmask
+//2  +---> poolmask
 //      3  +---> timeslot_index
 //      4  |     +---> index
 //      5  |     |     +---> hdr
@@ -343,6 +343,49 @@ return PyLong_FromLong(0) ;
 //     36  |     |     |     +---> update_2
 
 return PyLong_FromLong( 0 ) ; 
-}*/
+}
+
+
+static PyMethodDef module_methods[] = {
+    {"odbTables",  (PyCFunction)(void(*)(void))   odbTables_method ,
+     METH_VARARGS | METH_KEYWORDS,   "Show all existing ODB tables   "},
+    {"odbVarno",  (PyCFunction)(void(*)(void))    odbVarno_method ,
+     METH_VARARGS | METH_KEYWORDS,   "Print all ODB varno, parameters and description "},
+    {"odbFunctions",  (PyCFunction)(void(*)(void))    odbFunctions_method ,
+     METH_VARARGS | METH_KEYWORDS,   "Print all the possible function that could be used in ODB sql statement "},
+    {"odbDescribe",  (PyCFunction)(void(*)(void))    odbSchema_method ,
+     METH_VARARGS | METH_KEYWORDS,   "Print the ODB schema according to its tables and hiararchy"},
+
+};
+
+
+
+// Modules definition
+static struct PyModuleDef   odbmodule = {
+    PyModuleDef_HEAD_INIT,
+    "pyodb_info",
+    "C/Python interface , show ODB varno, parameters and description",
+    -1,
+    module_methods ,
+    .m_slots =NULL 
+};
+
+
+
+// Called first during python call
+PyMODINIT_FUNC PyInit_pyodb_info(void) {
+	PyObject* m  ; 
+	PyObject* ModuleError ;  
+        
+	m= PyModule_Create(&odbmodule);
+        if ( m == NULL) {
+           ModuleError = PyErr_NewException("Failed to create the module : pyodb_info", NULL, NULL);
+           Py_XINCREF(ModuleError) ;
+        return NULL;	
+      }
+return m  ; 
+}
+
+
 
 

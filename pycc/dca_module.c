@@ -4,12 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Python.h>
-//#include "odbdump.h"
+#include "odbdump.h"
 #include "magicwords.h"
 #include "info.h"
 #include "odb.h"
 #include "privpub.h"
-//#include "pyspam.h"
+#include "pyspam.h"
 #include "macros.h"
 
 
@@ -21,17 +21,17 @@ extern double util_walltime_();
 
 
 
-//static int maxhandle = 0;     /* Actual max no. of handles; increase/decrease via export ODB_MAXHANDLE */
+static int maxhandle = 0;     /* Actual max no. of handles; increase/decrease via export ODB_MAXHANDLE */
 
 //static  const int def_maxhandle = 10;
-//static  DB_t      *free_handles = NULL;
+static  DB_t      *free_handles = NULL;
 
-//PUBLIC void *
-//ODBc_get_free_handles(int *Maxhandle)
-//{  if (Maxhandle) *Maxhandle = maxhandle;  return (void *)free_handles; }
+PUBLIC void *
+ODBc_get_free_handles(int *Maxhandle)
+{  if (Maxhandle) *Maxhandle = maxhandle;  return (void *)free_handles; }
 
 
-static PyObject *odbDca_method( PyObject* Py_UNUSED(self) , PyObject *args , PyObject*  kwargs ) {
+static PyObject *pyodbDca_method( PyObject* Py_UNUSED(self) , PyObject *args , PyObject*  kwargs ) {
     char *path     = NULL ; 
     char *database = NULL ;
 
@@ -66,16 +66,8 @@ static PyObject *odbDca_method( PyObject* Py_UNUSED(self) , PyObject *args , PyO
     char* dbname_arg ;
     char* ncpu_arg ; 
     //char* quiet  ; 
-    if (dbname) { dbname_arg = concat ( " -l " , dbname   ); 
-        } 
-    else 
-    { dbname_arg=" " ;  
-        };
-    if (ncpu  ) { ncpu_arg   = concat ( " -N " , scpu     ); 
-    } else 
-    { 
-     ncpu_arg  =" " ;  
-    };
+    if (dbname) { dbname_arg = concat ( " -l " , dbname   ); } else { dbname_arg=" " ;  };
+    if (ncpu  ) { ncpu_arg   = concat ( " -N " , scpu     ); } else { ncpu_arg  =" " ;  };
     //if (verb  ) {  quiet = " -q "; } else { quiet =" " ;  };
 
     char* dca_path   = concat(dcagen_path , "/dcagen ");
@@ -102,5 +94,42 @@ static PyObject *odbDca_method( PyObject* Py_UNUSED(self) , PyObject *args , PyO
     free(dca_args) ;      // deallocate the string
     }
     return PyLong_FromLong( 0 ) ; 
-
 }
+
+
+static PyMethodDef module_methods[] = {
+    {"pyodbDca"  ,  (PyCFunction)(void(*)(void))    pyodbDca_method   ,
+     METH_VARARGS | METH_KEYWORDS,   "Close an opened ODB "},
+
+
+};
+
+
+// Modules definition
+static struct PyModuleDef   odbmodule = {
+    PyModuleDef_HEAD_INIT,
+    "pyodb_dca",
+    "Create and handle DCA files ( Direct Column Access files  )!",
+    -1,
+    module_methods ,
+     .m_slots =NULL
+};
+
+
+// Called first during python call
+PyMODINIT_FUNC PyInit_pyodb_dca(void) {
+    PyObject*  m  ;
+    PyObject*  ModuleError ;
+
+
+    m=PyModule_Create(&odbmodule);
+    if ( m == NULL) {
+        ModuleError = PyErr_NewException("Failed to create the module : pyodb_dca", NULL, NULL);
+        Py_XINCREF(ModuleError) ;
+        return NULL;
+}
+
+
+    return m  ;
+}
+

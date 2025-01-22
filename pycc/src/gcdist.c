@@ -22,7 +22,7 @@
 
 
 
-static PyObject* gcMatrix_method    (PyObject* self, PyObject *args) {
+static PyObject* gcMatrix_method    (PyObject* Py_UNUSED(self), PyObject *args) {
 
 int N =0       ; 
 PyObject *lats ;

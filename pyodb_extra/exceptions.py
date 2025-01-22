@@ -27,7 +27,7 @@ class pyodbErrMessage:
 
        "\n--Can't find the path to the ODB binaries\n--Set the ODB_INSTALL_DIR nvironement variable",          # 1
 
-       "\n--Can't find the path to the ODB library libodb.so\n--Set the ODB_INSTALL_DIR environement variable",# 2 
+       "\n--Something went wrong while loading libodb.so\n--Try to check  the ODB_INSTALL_DIR environment variable",# 2 
 
        "\n--cdll module can't find shared library libodb.so\n--Please check"+ \
             "that it has been installed  and ODB_INSTALL_LIB var is set",                                   # 3
@@ -117,4 +117,3 @@ class pyodbInstallError(Exception):
     Raises an error if something wrong occured during building the modules
     """
     pass 
-

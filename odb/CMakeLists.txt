@@ -76,6 +76,8 @@ message (${CMAKE_CXX_COMPILER}       )
 message (${CMAKE_CXX_COMPILER_AR}    )
 message (${CMAKE_CXX_COMPILER_RANLIB})
 message (${CMAKE_C_COMPILER_VERSION} )
+message (${CMAKE_Fortran_COMPILER}   )
+message (${CMAKE_Fortran_COMPILER_VERSION}  )
 message ("*************************************************")
 
 
@@ -85,11 +87,14 @@ if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU"  )
   
 
   # FOR gcc/gfortran  < 10.x.x 
-    if (  CMAKE_C_COMPILER_VERSION VERSION_LESS "10.0")
-      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}  -fPIC -ffree-line-length-none -Wno-argument-mismatch")
-      else ()
-      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}  -fPIC -ffree-line-length-none -fallow-argument-mismatch")
-  endif ()
+  if    ( CMAKE_Fortran_COMPILER_VERSION  VERSION_GREATER  "10.0"  )
+     message ("gfortran version is GREATER than 10.0")
+     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}  -fPIC -ffree-line-length-none  -fno-automatic   -fallow-argument-mismatch ")
+ elseif ( CMAKE_Fortran_COMPILER_VERSION  VERSION_GREATER   "10.0" )
+    message ("gfortran version is  LESS  than 10.0")
+     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}  -fPIC -ffree-line-length-none   -Wno-automatic   -Wallow-argument-mismatch ")
+
+ endif ()
 
   set(CMAKE_Fortran_FLAGS_DEBUG "-g -O0 -fcheck=bounds")
   set(CMAKE_Fortran_FLAGS_RELEASE "-O2")

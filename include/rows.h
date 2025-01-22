@@ -47,7 +47,7 @@ static int  getMaxrows ( char* database ,   char*  sql_query , int nfunc ) {
        if (maxlines > 0 && ++nrtot >= maxlines) break;	     
     }
     ci = odbdump_destroy_colinfo(ci, nci) ;
-    int rc = odbdump_close(h);  
+    odbdump_close(h);  
     FREEX(d);   
     }
    int ncols= (maxcols - nfunc ) ;     // requested cols - nfunctions in sql statement 

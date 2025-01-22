@@ -55,19 +55,22 @@ db_name = db_attr["name"]
 
 
 
-# Direct Column Access files 
-# CREATE DCA IF THEY ARN'T ALREADY THERE 
-# ALWAYS EXPORT IOASSIGN FILE , OTHERWISE dcagen WILL CRASH WITOUT FINISHING !!!
-if not os.path.isdir (dbpath+"/dca"):
-   os.environ["IOASSIGN "]           =dbpath+"/IOASSIGN"
-   ic=odbDca ( dbpath=dbpath, db= db_type, ncpu=8  )
-
-
 # CONNECT 
 iret  = odbConnect ( odbdir=dbpath+"/"+db_name  , mode="r")
 if iret < 0 :
    print("Failed  to open the odb"  , dbpath )
    sys.exit(0)
+
+
+# Direct Column Access files 
+# CREATE DCA IF THEY ARN'T ALREADY THERE 
+# ALWAYS EXPORT IOASSIGN FILE , OTHERWISE dcagen WILL CRASH WITOUT FINISHING !!!
+
+# IF THE ODB HAS BEEN OPENED ONCE THESE LINES CAN BE SWITCHED !
+if not os.path.isdir (dbpath+"/dca"):
+   os.environ["IOASSIGN "]           =dbpath+"/IOASSIGN"
+   ic=odbDca ( dbpath=dbpath, db= db_type, ncpu=8  )
+
 
 
 # SIMPLE SQL QUERY (lat,lon,obsvalue )

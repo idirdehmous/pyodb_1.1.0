@@ -40,7 +40,6 @@ class OdbEnv:
          self.basedir=odb_basedir
          self.libname=odb_libname 
          self.libdir =self.basedir+"/lib/"+self.libname 
-         print( "BASEDIR ....." ,   self.basedir, self.libdir  ) 
          if self.basedir != None:
             if os.path.isdir ( self.basedir ):
                self.bindir =self.basedir+"/bin"

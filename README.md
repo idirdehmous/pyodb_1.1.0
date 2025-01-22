@@ -19,9 +19,10 @@ Some modifictions have been done to make it compatible with C/Python API ( 3.8 -
 ## How it works ?
 
 ## Dependencies :
-        gcc compiler  = 13.2.0    
-        cmake        >= 3.15.0   
-        3.8.0  <=   python   <= 3.10  (NEEDS SOME READAPTATION FOR python3.11.x, 3.12.x,3.13.x )
+        cmake  >=   3.15.0
+        8.0.0  <= gcc compiler  <= 13.2.0    
+        3.8.0  <=   python      <= 3.10  (NEEDS SOME READAPTATION FOR python3.11.x, 3.12.x,3.13.x )
+
 
 ==> It has been widely developed and tested on ATOS. <br />
 So on ATOS  : <br />
@@ -40,9 +41,21 @@ So on ATOS  : <br />
         STEP 1 - FIRST, CREATE A BUILD DIRECORY TO INSTALL THE ODB LIBRARIES.
                mkdir -p  build_odb  
                cd build_odb 
-               cmake    -DCMAKE_INSTALL_PREFIX=/path/to/../../odb/install/dir         /path/to/../../pyodb_1.1.0 
+
+	       ODB_HOME=/path/to/../../odb/install/dir
+
+               cmake    -DCMAKE_INSTALL_PREFIX=${ODB_HOME}         /path/to/../../pyodb_1.1.0 
                make -j ncpu    ( has been tested with a maximum of 4  cpus  ) 
                make install  
+
+
+        Once the ODB is built and installed, add these environment variables to your   ~/.bashrc  file 
+          export ODB_INSTALL_DIR=/path/to/../../odb/install/dir
+          export PATH=${PATH}:/path/to/../../odb/install/dir/bin 
+          export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/path/to/../../odb/install/dir/lib 
+
+
+
 ```
 REMARK:  <br />
 -By the end the ODB installation, a file called 'odb_install_dir' will be created by cmake in the directory 'pyodb_1.1.0'. The latter will be used by setup.py <br />

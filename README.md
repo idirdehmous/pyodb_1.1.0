@@ -19,16 +19,22 @@ Some modifictions have been done to make it compatible with C/Python API ( 3.8 -
 ## How it works ?
 
 ## Dependencies :
-        cmake  >=   3.15.0
-        8.0.0  <= gcc compiler  <= 13.2.0    
+        cmake        >=   3.15.0
+        gcc compiler >=   14.1.0 
         3.8.0  <=   python      <= 3.10  (NEEDS SOME READAPTATION FOR python3.11.x, 3.12.x,3.13.x )
 
 
 ==> It has been widely developed and tested on ATOS. <br />
-So on ATOS  : <br />
-   module load   gcc/13.2.0           <br />
+   On ATOS    : <br />
+   module load   gcc/14.2.0           <br />
    module load   python3/3.10.10-01   <br />
    module load   cmake/3.25.2         <br />
+
+   On belenos : <br />
+   module load  gcc/14.1.0            <br />
+   module load  python/3.10.12        <br />
+   module load  cmake/3.24.1          <br />
+
 
 
 ## installation :  

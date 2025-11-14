@@ -129,6 +129,7 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
     ll_t nrtot = 0;
     int nd     = 0;
 
+    double float_val= 0 ; 
    // List to hold the column names  and values 
    PyObject **col_lists        = (PyObject **)malloc(ncols * sizeof(PyObject *));
    if (!col_lists) { 
@@ -158,8 +159,6 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
         }
      }
 
-
-    double float_val ; 
     // Loop over the rows    
     while ((nd = nextrow(h, d, dlen, &new_dataset)) > 0) {
         if (lpbar) {  ++ip;            print_progress(ip, prog_max); }   // useful for huge ODBs 
@@ -218,13 +217,12 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
                value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
                 break;
             default:
-                 float_val   = (double)d[i];
-                 double fval =  format_float ( float_val , fmt_float);
-                 buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = fval   ;
-                 value = PyFloat_FromDouble(  buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] );  
+               float_val   =  (double)d[i];
+	       double fval =  format_float ( float_val , fmt_float);
+               buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = fval    ;
+	       value =  PyFloat_FromDouble(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]) ;
                break;
         }   // switch  
-
 
        if (maxlines > 0 && nrtot >= maxlines)
             break;
@@ -235,12 +233,12 @@ if (row_idx < total_rows  ) {
     PyList_SET_ITEM(col_lists[i], row_idx, value);
        } else {
     PyList_Append(col_lists[i], value);
-    Py_DECREF(value);   // "Dec ref the reference object"
+    Py_DECREF(value);   // "Decref the reference object"
          }
-      }  // cols  
+      }   // cols  
         ++row_idx;
         ++nrtot;
-}        // while 
+} // while 
 
 // Get the colnames 
 for (int i=0 ; i<ncols ; i++ )   {
@@ -249,22 +247,19 @@ for (int i=0 ; i<ncols ; i++ )   {
 }
 
 
-//  FREE  struct and pointers 
-
+//  FREE  struct and PyObject pointers 
 if (strbufs) {
     for (int i = 0; i < ncols; ++i) {
         if (strbufs[i]) free(strbufs[i]);
     }
     free(strbufs);
 }
-
 if (col_lists) {
     for (int i = 0; i < ncols; ++i) {
         Py_XDECREF(col_lists[i]);
     }
     free(col_lists);
 }
-
 
     free (buffer ) ;  
     ci = odbdump_destroy_colinfo(ci, nci);

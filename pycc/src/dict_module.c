@@ -80,6 +80,11 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
 
     // Get maximum number of rows 
     int total_rows = getMaxrows(database, sql_query );
+    // Check number of rows --> check the query answer 
+    if ( total_rows ==0 ) {
+      PyErr_SetString(PyExc_RuntimeError, "--pyodb : The SQL request returned zero rows.");  
+      return NULL ;  }
+
     if (total_rows <= 0) total_rows = 4096;   // Fallback  
 
     prog_max = (size_t)total_rows;
@@ -93,9 +98,9 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
     }
 
     //   OPEN ODB ( isolate the thread for pur C . No python object is allowed to be created here .Python  GIL unlocked)
-    Py_BEGIN_ALLOW_THREADS  
+    //Py_BEGIN_ALLOW_THREADS  
     h = odbdump_open(database, sql_query, queryfile, poolmask, varvalue, &maxcols);
-    Py_END_ALLOW_THREADS
+    //Py_END_ALLOW_THREADS
     if (!h || maxcols <= 0) {
         PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to open ODB or invalid number of columns");
         return NULL  ;
@@ -106,7 +111,6 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
     // Allocation 
     double *buffer    = (double *)malloc(sizeof(double) * (size_t)total_rows * (size_t)ncols);
     char  **strbufs   = (char**)calloc((size_t)ncols, sizeof(char*));
-
     // If allocation failed  close !
     if (!buffer) { odbdump_close(h);  PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to allocate memory buffer for numeric values ");  return NULL ;  }
     if (!strbufs){ odbdump_close(h);  PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to allocate memory buffer for string  values ");  return NULL ;  }
@@ -130,6 +134,8 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
     int nd     = 0;
 
     double float_val= 0 ; 
+
+
    // List to hold the column names  and values 
    PyObject **col_lists        = (PyObject **)malloc(ncols * sizeof(PyObject *));
    if (!col_lists) { 
@@ -159,11 +165,13 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
         }
      }
 
+
+
     // Loop over the rows    
     while ((nd = nextrow(h, d, dlen, &new_dataset)) > 0) {
         if (lpbar) {  ++ip;            print_progress(ip, prog_max); }   // useful for huge ODBs 
-
-        // Reallocate buffer if needed 
+        
+	// Reallocate buffer if needed 
         if (row_idx >= total_rows) {
             total_rows *= 2;
             double *tmp = (double *)realloc(buffer, sizeof(double) * (size_t)total_rows * (size_t)ncols);
@@ -180,7 +188,6 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
         if (new_dataset) {
             ci = odbdump_destroy_colinfo(ci, nci);
             ci = odbdump_create_colinfo(h, &nci);
-
             new_dataset = 0;
         }
 
@@ -204,7 +211,10 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
 		                  }
                 break;
                         }
-            case DATATYPE_INT4:
+            case DATATYPE_INT1:
+	    case DATATYPE_INT2:
+	    case DATATYPE_INT4:
+
 		buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = (double)(int)d[i];
                 value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
 	         break ; 
@@ -219,8 +229,8 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
             default:
                float_val   =  (double)d[i];
 	       double fval =  format_float ( float_val , fmt_float);
-               buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = fval    ;
-	       value =  PyFloat_FromDouble(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]) ;
+	       buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = (double) fval  ;
+               value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
                break;
         }   // switch  
 

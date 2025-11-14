@@ -31,9 +31,8 @@ static int getMaxrows(const char* database, const char* sql_query)
     int nd;
     int (*nextrow)(void *, void *, int, int *) = odbdump_nextrow;
     int dlen = (unsigned int) maxcols;
-
     ALLOCX(d, maxcols);
-
+    
     while ((nd = nextrow(h, d, dlen, &new_dataset)) > 0) {
         if (new_dataset) {
             // ignorer dataset switches
@@ -43,17 +42,6 @@ static int getMaxrows(const char* database, const char* sql_query)
     }
     odbdump_close(h);
     FREEX(d);
-
-    //int ncols = maxcols - nfunc;
-    //if (ncols <= 0) {
-    //    fprintf(stderr, "[getMaxrows] Warning: nfunc >= maxcols, using maxcols instead.\n");
-    //    ncols = maxcols;
-    //}
-
-    // debug optionnel
-    // printf("[getMaxrows] maxcols=%d, nfunc=%d, ncols=%d, rows=%d\n",
-    //        maxcols, nfunc, ncols, nrows);
-
     return nrows;
 }
 

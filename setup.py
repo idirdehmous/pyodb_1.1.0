@@ -53,7 +53,6 @@ class BuildModule:
         print(f"Using ODB lib in: {lib_dir}")
 
         extra_compile_args = [
-         #"-fsanitize=address", "-fno-omit-frame-pointer",   
          "-fPIC", "-Wall", "-Wextra",
             "-Wsign-compare", "-Waddress",
             "-Wunused-variable", "-v"
@@ -121,6 +120,7 @@ def parse_version_from(path):
     return version_match.group(1)
 
 
+
 # EXTENSION SUFFIX  (only .so)
 sfx  =  sysconfig.get_config_var('EXT_SUFFIX')
 
@@ -134,6 +134,8 @@ m      =BuildModule("pyodb")
 pyodb  =m.Module(   "./pycc/main.c"     , include   )
 module_list=[ pyodb ]
 
-setup(  ext_modules = cythonize( module_list )     ,     cmdclass={"build_ext": NoSuffixBuilder}     )
+setup(  ext_modules = cythonize( module_list )     ,     
+        cmdclass={"build_ext": NoSuffixBuilder}    
+             )
 
 quit()

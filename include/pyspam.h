@@ -23,13 +23,13 @@
         #else
          Py_SET_SIZE((PyObject *)descr, N); // dernier recours pour versions >=2.0
      #endif
-
     if (!descr) return NULL;
     npy_intp dims[1] = { n };
     // Strides NULL => contigu with stride = elsize = 8
     PyObject *arr = PyArray_NewFromDescr(&PyArray_Type, descr,1, dims, NULL,(void*)data, 0, NULL);
     return arr;
 }
+
 
 
 

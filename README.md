@@ -89,12 +89,8 @@ REMARK:  <br />
 -The pyodb installation is tested as follow : 
 ```
 import pyodb
-print( pyodb.__doc__) 
+print( pyodb.__file__)  Prints the  location of the installed module
 ```
-
-
--For a complete import test script, please see 'tests/call_odb.py'  
-
 
 ## Epilogue 
 -If everything went well,one can use the example scripts under 'pyodb_1.1.0/tests' and reading the ODB(s) samples included in 'pyodb_1.1.0/odb_samples'. <br />
@@ -102,7 +98,7 @@ print( pyodb.__doc__)
 
 ===> REMARK :
 It's recommanded to run dcagen and dcagen.x just before archiving your ODB(s). <br /> 
-This will allows pyodb to don't create them on the fly( even any odb apps like odbsql ,odbdump.x etc). Having DCA in ODB directory  make fatching the data a bit faster.(Advice from S.Saarinen himself!).  <br />
+This will allows pyodb to don't create them on the fly( even any odb apps like odbsql ,odbdump.x etc). Having DCA in ODB directory  make fatching the data a bit faster.  <br />
 In the BATOR ,canari , screening , minimisation  scripts, the bash lines hereafter have to be added :  <br />
 ```
 

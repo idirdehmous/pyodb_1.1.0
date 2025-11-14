@@ -7,17 +7,31 @@ from   mpl_toolkits.axes_grid1 import make_axes_locatable
 from   pandas import  DataFrame   
 
 
-sys.path.insert(0,"/home/micro/test/pyodb_1.1.0/build/lib.linux-x86_64-cpython-312" )
+
 
 from pyodb_extra.environment  import  OdbEnv
 from pyodb_extra.odb_ob       import  OdbObject
 from pyodb_extra.parser       import  StringParser
 
 
+# Init env first  ( path to libodb.so, no  /lib/ ! )
+env= OdbEnv ("/where/the/libodb.so is installed/", "libodb.so")
+env.InitEnv ()
+
+
+# NOW pyodb modules could be imported !
+from pyodb       import   odbDict
+from pyodb       import   odbConnect , odbClose
+from pyodb       import   odbVarno
+
+# In the case where the DCA files exist this function is not needed !
+from pyodb     import     odbDca
 
 
 
-# GET ARGS from COMMAND LINE 
+
+
+# Get odbpath from command line
 nargv = len(sys.argv)
 if nargv > 1 :
   dbpath   = sys.argv[1]
@@ -31,19 +45,6 @@ else :
   print("  python   odb_plotter.py   dbpath  (ECMA.<obstype>  or CCMA )\n")
   exit(1)
 
-
-# INIT ENV ( path to libodb.so, no  /lib/ ! )
-env= OdbEnv ("/home/micro/test/pkg", "libodb.so")
-env.InitEnv ()
-
-
-# NOW pyodb modules could be imported !
-from pyodb       import   odbDict  
-from pyodb       import   odbConnect , odbClose 
-from pyodb       import   odbVarno 
-
-# IN CASE THE DCA FILE HAVE BEEN CREATED odbDca IS NOT NEED !
-from pyodb     import     odbDca  
 
 
 

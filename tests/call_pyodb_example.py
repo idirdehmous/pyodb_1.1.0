@@ -6,12 +6,23 @@ from   ctypes import cdll , CDLL
 from   ctypes.util import find_library 
 import pandas as  pd 
 
-sys.path.insert(0,  "/home/micro/test/pyodb_1.1.0/build/lib.linux-x86_64-cpython-312" )
-
-# python  MODULES 
+# pyodb .py    MODULES 
 from pyodb_extra.environment  import  OdbEnv
 from pyodb_extra.odb_ob       import  OdbObject
 from pyodb_extra.parser       import  StringParser  
+
+
+# Init env first  ( path to libodb.so, no  /lib/ ! )
+env= OdbEnv ("/where/the/libodb.so is installed/", "libodb.so")
+env.InitEnv ()
+
+# --> NOW pyodb could be imported  !
+from pyodb   import  odbFetch   , odbDict
+from pyodb   import  odbConnect , odbClose
+from pyodb   import  odbDca
+
+
+
 
 # GET ARGS from COMMAND LINE 
 nargv = len(sys.argv)
@@ -28,23 +39,14 @@ else :
   exit(1)
 
 
-# INIT ENV ( path to libodb.so, no  /lib/ ! )
-env= OdbEnv ("/home/micro/test/pkg", "libodb.so")
-env.InitEnv ()
 
-# --> NOW pyodb could be imported  !
-from pyodb   import  odbFetch   , odbDict
-from pyodb   import  odbConnect , odbClose 
-from pyodb   import  odbDca  
-
-
-
+# Some needed attributes 
 db      = OdbObject ( dbpath )
 db_attr = db.GetAttrib()
 db_type = db_attr["type"]
 db_name = db_attr["name"]
 
-# CONNECT 
+# Connect 
 iret  = odbConnect ( odbdir =dbpath+"/"+db_name   )
 if iret < 0 :
    print("Failed  to open the odb"  , dbpath )

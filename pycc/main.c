@@ -28,7 +28,7 @@ static PyMethodDef module_methods[] = {
     {"odbFetch" ,  (PyCFunction)(void(*)(void))     odbFetch_method ,
      METH_VARARGS | METH_KEYWORDS,   "Fetch rows from a given ECMA or CCMA ODB database given sql query. This function returns a numpy. Suitable to speed up the selection if there only numeric data types in the query"},
 
-     {"odbDict" ,  (PyCFunction)(void(*)(void))   odbDict_method ,
+    {"odbDict" ,  (PyCFunction)(void(*)(void))   odbDict_method ,
       METH_VARARGS | METH_KEYWORDS,   "Fetch rows as a python  dict"},
 
     {"odbDca"  ,  (PyCFunction)(void(*)(void))      odbDca_method   ,
@@ -49,6 +49,7 @@ static struct PyModuleDef   odbmodule = {
 
 // Called first during python call
 PyMODINIT_FUNC PyInit_pyodb (void) {
+
     PyObject*  m  ;
     PyObject* ModuleError ;
     m=PyModule_Create(&odbmodule);
@@ -57,6 +58,11 @@ PyMODINIT_FUNC PyInit_pyodb (void) {
         Py_XINCREF(ModuleError) ;
         return NULL;
 }
+
+PyOdbEmptyResultError = PyErr_NewException("pyodb.EmptyResultError", NULL, NULL);
+Py_INCREF(PyOdbEmptyResultError);
+PyModule_AddObject(m , "EmptyResultError", PyOdbEmptyResultError);
+
     return m  ;
 }
 

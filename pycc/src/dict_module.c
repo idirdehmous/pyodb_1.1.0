@@ -17,7 +17,7 @@
 #include "rows.h" 
 
 
-// --- Déclaration de l'exception globale (en haut du fichier C) ---
+// Declare excption  proto 
 static PyObject *PyOdbEmptyResultError = NULL;
 
 
@@ -81,12 +81,11 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
 
     // Get maximum number of rows 
     int total_rows = getMaxrows(database, sql_query );
+
     // Check number of rows --> check the query answer 
-<<<<<<< HEAD
     if ( total_rows ==0 ) {
       PyErr_SetString(PyExc_RuntimeError, "--pyodb : The SQL request returned zero rows.");  
       return NULL ;  }
-=======
     if (total_rows == 0)
     {
         // Specific Exception to  catche in python 
@@ -97,7 +96,6 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
                      sql_query ? sql_query : "(null)");
         return NULL;
     }
->>>>>>> 092b9bf... Add PyEmptyRow exception
 
     if (total_rows <= 0) total_rows = 4096;   // Fallback  
 
@@ -244,11 +242,8 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
                float_val   =  (double)d[i];
 	       double fval =  format_float ( float_val , fmt_float);
 	       buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = (double) fval  ;
-<<<<<<< HEAD
-               value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
-=======
+               //value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
                value = PyFloat_FromDouble(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
->>>>>>> 092b9bf... Add PyEmptyRow exception
                break;
         }   // switch  
 
@@ -279,7 +274,6 @@ for (int i=0 ; i<ncols ; i++ )   {
 if (strbufs) {
     for (int i = 0; i < ncols; ++i) {
         if (strbufs[i]) free(strbufs[i]);
-<<<<<<< HEAD
     }
     free(strbufs);
 }
@@ -287,16 +281,13 @@ if (col_lists) {
     for (int i = 0; i < ncols; ++i) {
         Py_XDECREF(col_lists[i]);
     }
-=======
     }
-    free(strbufs);
 }
 
 if (col_lists) {
 //    for (int i = 0; i < ncols; ++i) {
 //        Py_XDECREF(col_lists[i]);
 //    }
->>>>>>> 092b9bf... Add PyEmptyRow exception
     free(col_lists);
 }
 

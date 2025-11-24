@@ -78,7 +78,8 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
     size_t ip       = 0 ;
     size_t prog_max = 0 ;
     int    row_idx  = 0 ;
-
+    int   nci       = 0;
+    Bool print_mdi  = true ; 
     // Get maximum number of rows 
     int total_rows = getMaxrows(database, sql_query );
 
@@ -108,45 +109,34 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
         else if (queryfile)
             printf("Executing query from file   : %s\n", queryfile);
     }
-
     //   OPEN ODB ( isolate the thread for pur C . No python object is allowed to be created here .Python  GIL unlocked)
     //Py_BEGIN_ALLOW_THREADS  
     h = odbdump_open(database, sql_query, queryfile, poolmask, varvalue, &maxcols);
     //Py_END_ALLOW_THREADS
     if (!h || maxcols <= 0) {
         PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to open ODB or invalid number of columns");
-        return NULL  ;
-    }
+        return NULL  ; }
     // Number of columns taking into account the number of functions in the query  (col pure - n columns function)
     int ncols = maxcols - fcols;
-
     // Allocation 
     double *buffer    = (double *)malloc(sizeof(double) * (size_t)total_rows * (size_t)ncols);
     char  **strbufs   = (char**)calloc((size_t)ncols, sizeof(char*));
     // If allocation failed  close !
     if (!buffer) { odbdump_close(h);  PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to allocate memory buffer for numeric values ");  return NULL ;  }
     if (!strbufs){ odbdump_close(h);  PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to allocate memory buffer for string  values ");  return NULL ;  }
-
-    if (verbose)
-        printf("Number of requested columns : %d\n", ncols);
-
+    if (verbose)   printf("Number of requested columns : %d\n", ncols);
    // Internal ODB vars 
     int new_dataset = 0;
     colinfo_t *ci   = NULL;
-    int   nci       = 0;
     double *d       = NULL;
     ALLOCX(d, maxcols);
-
     Bool packed = false;
     int (*nextrow)(void *, void *, int, int *) =
         packed ? odbdump_nextrow_packed : odbdump_nextrow;
     int dlen = packed ? maxcols * (int)sizeof(*d) : maxcols;
-
     ll_t nrtot = 0;
     int nd     = 0;
-
     double float_val= 0 ; 
-
 
    // List to hold the column names  and values 
    PyObject **col_lists        = (PyObject **)malloc(ncols * sizeof(PyObject *));
@@ -154,31 +144,23 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
 	PyErr_SetString(PyExc_RuntimeError, "--pyodb : PyObject memory allocation error");  
 	return NULL  ;
    }
-
    // Dict object 
    PyObject  *dict = PyDict_New();
-
    if (!dict) {
       PyErr_SetString(PyExc_RuntimeError, "--pyodb : PyObject dictionary allocation error");
        return NULL  ; 
     }
-
    // Init buffer strings 
    for (int i = 0; i < ncols; ++i) {
     strbufs[i] = (char*)calloc((size_t)total_rows, (size_t)ODB_STRLEN +1);
     }
-
     // Init columns lists 
     for (int i = 0; i < ncols; ++i) {
         col_lists[i] = PyList_New(total_rows);
         if (!col_lists[i]) {
             PyErr_SetString(PyExc_RuntimeError, "--pyodb : PyObject memory allocation error");
              return NULL  ; 
-        }
-     }
-
-
-
+        } }
     // Loop over the rows    
     while ((nd = nextrow(h, d, dlen, &new_dataset)) > 0) {
         if (lpbar) {  ++ip;            print_progress(ip, prog_max); }   // useful for huge ODBs 
@@ -195,7 +177,6 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
                      }
             buffer = tmp;
             }
-
         // New  dataset 
         if (new_dataset) {
             ci = odbdump_destroy_colinfo(ci, nci);
@@ -205,37 +186,44 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
 
 	// Cols 
         for (int i = 0; i < ncols; ++i) {
-        colinfo_t *pci   = &ci[i];
-        PyObject *value  =  NULL ;
-        switch (pci->dtnum) {
-		case DATATYPE_STRING: {
-                       char *dst = &strbufs[i][(size_t)row_idx * ODB_STRLEN];
-                        if (fabs(d[i]) == mdi) {
-                             memset(dst, 0, ODB_STRLEN);
-                             strncpy(dst, "NULL", ODB_STRLEN - 1);
-			     value = PyUnicode_FromStringAndSize(dst, strnlen(dst , ODB_STRLEN));
-                            } else {
-                            union { char s[sizeof(double)]; double d; } u;
-                            u.d = d[i];
-                            memcpy(dst, u.s , ODB_STRLEN);
-                            dst[ODB_STRLEN ] = '\0';  // important
-			    value = PyUnicode_FromStringAndSize(dst, strnlen(dst, ODB_STRLEN));
-		                  }
+            colinfo_t *pci    = &ci[i];
+            PyObject  *value  =  NULL ;
+           if (print_mdi && pci->dtnum != DATATYPE_STRING && ABS(d[i]) == mdi) {
+              /*char *dst = &strbufs[i][(size_t)row_idx * ODB_STRLEN];
+              memset(dst, , ODB_STRLEN);
+              strncpy(dst, NAN , ODB_STRLEN - 1);
+              value = PyUnicode_FromStringAndSize(dst, strnlen(dst , ODB_STRLEN));*/
+         	  value = Py_None  ; 
+                  Py_INCREF(Py_None)  ; 
+
+          } else {
+              switch (pci->dtnum) {
+            	case DATATYPE_STRING: {
+                        char *dst = &strbufs[i][(size_t)row_idx * ODB_STRLEN];
+                        union { char s[sizeof(double)]; double d; } u;
+                        u.d = d[i];
+                        memcpy(dst, u.s , ODB_STRLEN);
+                        dst[ODB_STRLEN ] = '\0';  
+			if ( dst ) 
+			{ value = PyUnicode_FromStringAndSize(dst, strnlen(dst, ODB_STRLEN));			      
+			}else {
+//				value = PyUnicode_FromStringAndSize("NULL", );
+				value = PyUnicode_FromFormat ("NULL    ")  ; 
+				}
                 break;
-                        }
+	             }
             case DATATYPE_INT1:
 	    case DATATYPE_INT2:
 	    case DATATYPE_INT4:
-
 		buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = (double)(int)d[i];
                 value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
-	         break ; 
+	        break ; 
             case DATATYPE_YYYYMMDD:
 	         buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = (double)(int)d[i];	    
                  value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
-                 break ; 
+                break ; 
             case DATATYPE_HHMMSS:
-               buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = (double)(int)d[i];
+	    buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = (double)(int)d[i];
                value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
                 break;
             default:
@@ -247,12 +235,12 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
                break;
         }   // switch  
 
+	      }  // else of mdi  
        if (maxlines > 0 && nrtot >= maxlines)
             break;
 
 // Fill the lists 
 if (row_idx < total_rows  ) {
-    
     PyList_SET_ITEM(col_lists[i], row_idx, value);
        } else {
     PyList_Append(col_lists[i], value);
@@ -268,8 +256,6 @@ for (int i=0 ; i<ncols ; i++ )   {
     const char *colname = ci[i].nickname ? ci[i].nickname : ci[i].name;
     PyDict_SetItemString(dict , colname, col_lists[i]);
 }
-
-
 //  FREE  struct and PyObject pointers 
 if (strbufs) {
     for (int i = 0; i < ncols; ++i) {
@@ -280,21 +266,12 @@ if (strbufs) {
 if (col_lists) {
     for (int i = 0; i < ncols; ++i) {
         Py_XDECREF(col_lists[i]);
+          }
     }
-    }
-}
-
-if (col_lists) {
-//    for (int i = 0; i < ncols; ++i) {
-//        Py_XDECREF(col_lists[i]);
-//    }
-    free(col_lists);
-}
-
-    free (buffer ) ;  
-    ci = odbdump_destroy_colinfo(ci, nci);
-    odbdump_close(h);
-
-    if (d) {  FREEX(d);   }
-    return dict  ; 
+if (col_lists) {    free(col_lists); }
+free (buffer ) ;  
+ci = odbdump_destroy_colinfo(ci, nci);
+odbdump_close(h);
+if (d) {  FREEX(d);   }
+return dict  ; 
 }

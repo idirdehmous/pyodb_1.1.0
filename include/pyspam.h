@@ -7,6 +7,10 @@
 #include <numpy/arrayobject.h>
 #include <numpy/ndarraytypes.h>
 
+//#define  NMDI = -2147483647   
+//#define  RMDI = -2147483647.0 
+
+
 #include  <stdio.h> 	
 #include  <Python.h>
 #include  "odbdump.h"

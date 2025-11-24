@@ -5,6 +5,7 @@
 #include "fetch_module.h"
 #include "dca_module.h"
 #include "dict_module.h"
+#include "geo_module.h"
 
 
 
@@ -34,6 +35,9 @@ static PyMethodDef module_methods[] = {
     {"odbDca"  ,  (PyCFunction)(void(*)(void))      odbDca_method   ,
      METH_VARARGS | METH_KEYWORDS,   "Create DCA  (Direct Column  Access )   files "},
 
+    {"odbGcdistance"  ,  (PyCFunction)(void(*)(void))      odbGcdistance_method   ,
+     METH_VARARGS | METH_KEYWORDS,   "Compute great circle distance between latlon pairs "},
+
 };
 
 
@@ -49,6 +53,8 @@ static struct PyModuleDef   odbmodule = {
 
 // Called first during python call
 PyMODINIT_FUNC PyInit_pyodb (void) {
+
+    import_array();   //   Init  Numpy C API  ... Otherwise  segfaults are everywhere  :-)
 
     PyObject*  m  ;
     PyObject* ModuleError ;

@@ -6,6 +6,7 @@ from   ctypes import cdll , CDLL
 from   ctypes.util import find_library 
 import pandas as  pd 
 
+
 # pyodb .py    MODULES 
 from pyodb_extra.environment  import  OdbEnv
 from pyodb_extra.odb_ob       import  OdbObject
@@ -13,7 +14,7 @@ from pyodb_extra.parser       import  StringParser
 
 
 # Init env first  ( path to libodb.so, no  /lib/ ! )
-env= OdbEnv ("/where/the/libodb.so is installed/", "libodb.so")
+env= OdbEnv ("/home/idehmous/Desktop/rmib_dev/github/pkg", "libodb.so")
 env.InitEnv ()
 
 # --> NOW pyodb could be imported  !
@@ -77,7 +78,7 @@ nfunctions=nfunc    # (type == integer ) Number of columns considring the functi
 query_file=None     # (type == str     ) The sql file if used rather than sql request string 
 poolmask   =None    # (type ==str      ) The pool number (  must be a string  "1" , "2", "33" ...  , etc   )
 progress  =True     # (type == bool    ) Progress bar (we need to see what happends in the case of "huge " ODBs)
-float_fmt = 2       # (type == str     ) Number of digits for floats (same syntax  as in C  )
+float_fmt = 5       # (type == str     ) Number of digits for floats (same syntax  as in C  )
 verbose   =False    # (type == bool    ) Verbosity   on/off  
 
 

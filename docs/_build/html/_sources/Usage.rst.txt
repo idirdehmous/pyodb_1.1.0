@@ -40,4 +40,29 @@ The DCA files can be created on the fly when any of the binaries such as odbdump
 
 Send and fetch data from a given ECMA or CCMA 
 ----------------------------------------------
- 
+The function used to send an SQL query ,  get the data and store them in a python variable is 'odbDict'. Note that the ODB rows are returned as a python disctionary with the name of the quered columns as keys and the lists of data as values. 
+The function needs some requiered and optional arguments and are described hereafter:
+
+
+.. code-block:: python
+   
+   nfunctions = nfunc    # (type -> integer ) Number of columns considring the functions in the sql statement  (degrees, rad, avg etc ...)
+   query_file = None     # (type -> str     ) The sql file if used rather than sql request string 
+   poolmask   = None     # (type -> str     ) The ODB pools to consider (  must be a string  "1" , "2", "33" ...  , etc   )
+   progress   = True     # (type -> bool    ) Progress bar (very useful in the case of huge ODBs )
+   float_fmt  = 5        # (type -> int     ) Number of digits for floats (same syntax )
+   verbose    = False    # (type -> bool    ) Verbosity  on/off   
+
+
+   # SQL query  
+   sql_query="select   statid ,degrees(lat) ,  degrees(lon) , varno, obsvalue   FROM  hdr, body"
+
+   # Path to ODB  
+   odbpath= "/".join( (dbpath, db_type) )
+
+   # Send and get the data 
+   data =odbDict  (dbpath ,sql, nfunctions ,float_fmt, query_file , poolmask , progress, verbose  )
+
+   
+
+

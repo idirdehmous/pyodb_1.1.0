@@ -112,6 +112,26 @@ We consider the use of an CCMA odb (The same code  works also for ECMA )</p>
 </section>
 <section id="send-and-fetch-data-from-a-given-ecma-or-ccma">
 <h2>Send and fetch data from a given ECMA or CCMA<a class="headerlink" href="#send-and-fetch-data-from-a-given-ecma-or-ccma" title="Link to this heading"></a></h2>
+<p>The function used to send an SQL query ,  get the data and store them in a python variable is ‘odbDict’. Note that the ODB rows are returned as a python disctionary with the name of the quered columns as keys and the lists of data as values.
+The function needs some requiered and optional arguments and are described hereafter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfunctions</span> <span class="o">=</span> <span class="n">nfunc</span>    <span class="c1"># (type -&gt; integer ) Number of columns considring the functions in the sql statement  (degrees, rad, avg etc ...)</span>
+<span class="n">query_file</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># (type -&gt; str     ) The sql file if used rather than sql request string</span>
+<span class="n">poolmask</span>   <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># (type -&gt; str     ) The ODB pools to consider (  must be a string  &quot;1&quot; , &quot;2&quot;, &quot;33&quot; ...  , etc   )</span>
+<span class="n">progress</span>   <span class="o">=</span> <span class="kc">True</span>     <span class="c1"># (type -&gt; bool    ) Progress bar (very useful in the case of huge ODBs )</span>
+<span class="n">float_fmt</span>  <span class="o">=</span> <span class="mi">5</span>        <span class="c1"># (type -&gt; int     ) Number of digits for floats (same syntax )</span>
+<span class="n">verbose</span>    <span class="o">=</span> <span class="kc">False</span>    <span class="c1"># (type -&gt; bool    ) Verbosity  on/off</span>
+
+
+<span class="c1"># SQL query</span>
+<span class="n">sql_query</span><span class="o">=</span><span class="s2">&quot;select   statid ,degrees(lat) ,  degrees(lon) , varno, obsvalue   FROM  hdr, body&quot;</span>
+
+<span class="c1"># Path to ODB</span>
+<span class="n">odbpath</span><span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">db_type</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="c1"># Send and get the data</span>
+<span class="n">data</span> <span class="o">=</span><span class="n">odbDict</span>  <span class="p">(</span><span class="n">dbpath</span> <span class="p">,</span><span class="n">sql</span><span class="p">,</span> <span class="n">nfunctions</span> <span class="p">,</span><span class="n">float_fmt</span><span class="p">,</span> <span class="n">query_file</span> <span class="p">,</span> <span class="n">poolmask</span> <span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">verbose</span>  <span class="p">)</span>
+</pre></div>
+</div>
 </section>
 </section>
 

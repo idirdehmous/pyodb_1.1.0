@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usage &mdash; pyodb 1.1.0 documentation</title>
+  <title>Installation &mdash; pyodb 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -42,10 +42,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Usage</a><ul>
-<li><a class="reference internal" href="#example">Example</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Installation</a></li>
 </ul>
 </div>
         </div>
@@ -62,9 +59,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Usage</li>
+      <li class="breadcrumb-item active">Installation</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -72,21 +69,33 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
-<section id="example">
-<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
-<p>The package pyodb is written in C/Python API. It contains a set of functions as an interface between python and ODB softeware.
-In order to open a given database one has to import the module “odbConnect”. Ths function returns positive value for a seccessful connection and negative if it fails.
-We consider the use of an CCMA odb (The same code  works also for ECMA )</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyodb</span><span class="w"> </span><span class="kn">import</span> <span class="n">odbConnect</span>
-<span class="n">iret</span>  <span class="o">=</span> <span class="n">odbConnect</span><span class="p">(</span><span class="n">odbdir</span> <span class="o">=</span><span class="s2">&quot;imaginary/../CCMA&quot;</span> <span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">npools</span><span class="o">=</span><span class="s2">&quot;1&quot;</span>  <span class="p">)</span>
-<span class="k">if</span> <span class="n">iret</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">:</span>
-   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed  to open the odb&quot;</span>  <span class="p">,</span> <span class="n">dbpath</span> <span class="p">)</span>
-   <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>STEP<span class="w"> </span><span class="m">0</span><span class="w"> </span>-<span class="w"> </span>download<span class="w"> </span>the<span class="w"> </span><span class="nb">source</span><span class="w"> </span>code:
+
+<span class="w">    </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/idirdehmous/pyodb_1.1.0
+
+
+STEP<span class="w"> </span><span class="m">1</span><span class="w"> </span>-<span class="w"> </span>FIRST,<span class="w"> </span>CREATE<span class="w"> </span>A<span class="w"> </span>BUILD<span class="w"> </span>DIRECTORY<span class="w"> </span>TO<span class="w"> </span>INSTALL<span class="w"> </span>THE<span class="w"> </span>ODB<span class="w"> </span>LIBRARIES.
+
+<span class="w">    </span>mkdir<span class="w"> </span>-p<span class="w"> </span>build_odb
+<span class="w">    </span><span class="nb">cd</span><span class="w"> </span>build_odb
+
+<span class="w">    </span><span class="nv">ODB_HOME</span><span class="o">=</span>/path/to/../../odb/install/dir
+
+<span class="w">    </span>cmake<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="si">${</span><span class="nv">ODB_HOME</span><span class="si">}</span><span class="w"> </span>/path/to/../../pyodb_1.1.0
+<span class="w">    </span>make<span class="w"> </span>-j<span class="w"> </span>ncpu<span class="w">      </span><span class="c1"># tested with max 4 CPUs</span>
+<span class="w">    </span>make<span class="w"> </span>install
+
+
+Once<span class="w"> </span>the<span class="w"> </span>ODB<span class="w"> </span>is<span class="w"> </span>built<span class="w"> </span>and<span class="w"> </span>installed,<span class="w"> </span>add<span class="w"> </span>these<span class="w"> </span>environment<span class="w"> </span>variables
+to<span class="w"> </span>your<span class="w"> </span>~/.bashrc<span class="w"> </span>file:
+
+<span class="w">    </span><span class="nb">export</span><span class="w"> </span><span class="nv">ODB_INSTALL_DIR</span><span class="o">=</span>/path/to/../../odb/install/dir
+<span class="w">    </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">PATH</span><span class="si">}</span>:/path/to/../../odb/install/dir/bin
+<span class="w">    </span><span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span>:/path/to/../../odb/install/dir/lib
 </pre></div>
 </div>
-</section>
 </section>
 
 

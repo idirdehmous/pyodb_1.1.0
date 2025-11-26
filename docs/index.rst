@@ -7,5 +7,5 @@ pyodb documentation
 
    Introduction 
    Installation 
-   Dependecies 
+   Dependencies 
    Usage 

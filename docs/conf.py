@@ -14,12 +14,7 @@ release = '1.1.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-
-extensions = [
-#    "sphinx.ext.autodoc",     # ← nécessaire pour automodule, autoclass, autofunction
-#    "sphinx.ext.napoleon",    # ← pour les docstrings Google/Numpy
-#    "sphinx.ext.viewcode",    # ← pour afficher le code source
-]
+extensions = []
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -32,9 +27,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "navigation_depth": 3,
-    "collapse_navigation": False,
-    "sticky_navigation": True,
+    "collapse_navigation": True,
+    "sticky_navigation"  : True,
 }
 
-#html_theme = 'alabaster'
-#html_static_path = ['_static']

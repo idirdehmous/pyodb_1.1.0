@@ -55,7 +55,7 @@ class DrHook:
                   # ISO C99 signals.
                   2  : "SIGINT"  ,              #/* Interactive attention signal.
                   4  : "SIGILL"  ,              #/* Illegal instruction.  
-                  6  : "SIGA:BRT",              #/* Abnormal termination.  
+                  6  : "SIGABORT",              #/* Abnormal termination.  
                   8  : "SIGFPE"  ,              #/* Erroneous arithmetic operation.  
                  11  : "SIGSEGV" ,              #/* Invalid access to storage.  
                  15  : "SIGTERM" ,              #/* Termination request.  

@@ -17,6 +17,7 @@ __all__ =[  "pyodbErrMessage"        ,
 
 
 
+
 class pyodbErrMessage:
       def __init__(self):
           return None 

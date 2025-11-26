@@ -114,7 +114,32 @@ We consider the use of an CCMA odb (The same code  works also for ECMA )</p>
 <h2>Send and fetch data from a given ECMA or CCMA<a class="headerlink" href="#send-and-fetch-data-from-a-given-ecma-or-ccma" title="Link to this heading"></a></h2>
 <p>The function used to send an SQL query ,  get the data and store them in a python variable is ‘odbDict’. Note that the ODB rows are returned as a python disctionary with the name of the quered columns as keys and the lists of data as values.
 The function needs some requiered and optional arguments and are described hereafter:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nfunctions</span> <span class="o">=</span> <span class="n">nfunc</span>    <span class="c1"># (type -&gt; integer ) Number of columns considring the functions in the sql statement  (degrees, rad, avg etc ...)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pure python modules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyodb_extra.environment</span><span class="w">  </span><span class="kn">import</span>  <span class="n">OdbEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyodb_extra.odb_ob</span><span class="w">       </span><span class="kn">import</span>  <span class="n">OdbObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyodb_extra.parser</span><span class="w">       </span><span class="kn">import</span>  <span class="n">StringParser</span>
+
+
+<span class="c1"># C/Python module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyodb</span><span class="w"> </span><span class="kn">import</span> <span class="n">odbDict</span>
+
+
+
+<span class="c1"># The SQL query</span>
+<span class="c1"># Let&#39;s get the AMDAR/AIREP data only</span>
+<span class="n">sql_query</span><span class="o">=</span><span class="s2">&quot;select   statid ,obstype, varno, degrees(lat) ,  degrees(lon) ,  obsvalue   FROM  hdr, body WHERE obstype == 2&quot;</span>
+
+<span class="c1"># Check the query</span>
+<span class="n">p</span> <span class="o">=</span><span class="n">StringParser</span><span class="p">()</span>
+
+<span class="c1"># The number of functions in the SQL statement</span>
+<span class="c1"># In C ODB code :  N pure columns =   ( N All columns - N functions in sql query)</span>
+<span class="n">nfunc</span>  <span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">ParseTokens</span> <span class="p">(</span> <span class="n">sql_query</span> <span class="p">)</span>
+
+<span class="c1"># Check and clean before sending ! (It remove eventual non-printable characters )</span>
+<span class="n">sql</span>    <span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">CleanString</span> <span class="p">(</span> <span class="n">sql_query</span>  <span class="p">)</span>
+
+<span class="n">nfunctions</span> <span class="o">=</span> <span class="n">nfunc</span>    <span class="c1"># (type -&gt; integer ) Number of columns considring the functions in the sql statement  (degrees, rad, avg etc ...)</span>
 <span class="n">query_file</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># (type -&gt; str     ) The sql file if used rather than sql request string</span>
 <span class="n">poolmask</span>   <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># (type -&gt; str     ) The ODB pools to consider (  must be a string  &quot;1&quot; , &quot;2&quot;, &quot;33&quot; ...  , etc   )</span>
 <span class="n">progress</span>   <span class="o">=</span> <span class="kc">True</span>     <span class="c1"># (type -&gt; bool    ) Progress bar (very useful in the case of huge ODBs )</span>
@@ -130,6 +155,18 @@ The function needs some requiered and optional arguments and are described herea
 
 <span class="c1"># Send and get the data</span>
 <span class="n">data</span> <span class="o">=</span><span class="n">odbDict</span>  <span class="p">(</span><span class="n">dbpath</span> <span class="p">,</span><span class="n">sql</span><span class="p">,</span> <span class="n">nfunctions</span> <span class="p">,</span><span class="n">float_fmt</span><span class="p">,</span> <span class="n">query_file</span> <span class="p">,</span> <span class="n">poolmask</span> <span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">verbose</span>  <span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+
+
+<span class="p">[</span><span class="c1">##################################################] Complete 100%  (Total: 51 rows)</span>
+
+<span class="p">{</span><span class="n">statid</span><span class="nd">@hdr</span> <span class="p">[</span><span class="s1">&#39;2YIQTRJA&#39;</span><span class="p">,</span> <span class="s1">&#39;2YIQTRJA&#39;</span><span class="p">,</span> <span class="s1">&#39;2YIQTRJA&#39;</span><span class="p">,</span> <span class="s1">&#39;ZUMAVXZA&#39;</span><span class="p">,</span> <span class="s1">&#39;ZUMAVXZA&#39;</span><span class="p">,</span><span class="o">....</span><span class="p">,</span>    <span class="p">]</span>
+<span class="n">obstype</span><span class="nd">@hdr</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">.....</span><span class="p">,</span> <span class="p">]</span>
+<span class="n">varno</span><span class="nd">@body</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span><span class="o">.....</span><span class="p">,</span>  <span class="p">]</span>
+<span class="n">degrees</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="p">[</span><span class="mf">62.38</span><span class="p">,</span> <span class="mf">62.38</span><span class="p">,</span> <span class="mf">62.38</span><span class="p">,</span> <span class="mf">61.97</span><span class="p">,</span> <span class="mf">61.97</span><span class="p">,</span> <span class="mf">61.97</span><span class="p">,</span> <span class="mf">61.26</span><span class="p">,</span><span class="o">...</span><span class="p">,</span> <span class="p">]</span>
+<span class="n">degrees</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.54</span><span class="p">,</span><span class="o">....</span> <span class="p">,</span>  <span class="p">]</span>
+<span class="n">obsvalue</span><span class="nd">@body</span> <span class="p">[</span><span class="mf">216.0</span><span class="p">,</span> <span class="mf">28.72984</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.00899</span><span class="p">,</span> <span class="mf">214.2</span><span class="p">,</span> <span class="mf">32.57982</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.5788</span><span class="p">,</span><span class="o">...</span><span class="p">,]</span>  <span class="p">}</span>
 </pre></div>
 </div>
 </section>

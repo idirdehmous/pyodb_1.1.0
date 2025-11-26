@@ -45,7 +45,32 @@ The function needs some requiered and optional arguments and are described herea
 
 
 .. code-block:: python
+
+   # Pure python modules 
+   from pyodb_extra.environment  import  OdbEnv
+   from pyodb_extra.odb_ob       import  OdbObject
+   from pyodb_extra.parser       import  StringParser
+
+
+   # C/Python module 
+   from pyodb import odbDict  
+  
    
+
+   # The SQL query  
+   # Let's get the AMDAR/AIREP data only 
+   sql_query="select   statid ,obstype, varno, degrees(lat) ,  degrees(lon) ,  obsvalue   FROM  hdr, body WHERE obstype == 2"
+
+   # Check the query 
+   p =StringParser()
+
+   # The number of functions in the SQL statement
+   # In C ODB code :  N pure columns =   ( N All columns - N functions in sql query)
+   nfunc  =p.ParseTokens ( sql_query )    
+
+   # Check and clean before sending ! (It remove eventual non-printable characters )
+   sql    =p.CleanString ( sql_query  )  
+
    nfunctions = nfunc    # (type -> integer ) Number of columns considring the functions in the sql statement  (degrees, rad, avg etc ...)
    query_file = None     # (type -> str     ) The sql file if used rather than sql request string 
    poolmask   = None     # (type -> str     ) The ODB pools to consider (  must be a string  "1" , "2", "33" ...  , etc   )
@@ -62,7 +87,16 @@ The function needs some requiered and optional arguments and are described herea
 
    # Send and get the data 
    data =odbDict  (dbpath ,sql, nfunctions ,float_fmt, query_file , poolmask , progress, verbose  )
-
+ 
+   print( data ) 
    
 
+   [##################################################] Complete 100%  (Total: 51 rows)
+
+   {statid@hdr ['2YIQTRJA', '2YIQTRJA', '2YIQTRJA', 'ZUMAVXZA', 'ZUMAVXZA',....,    ]
+   obstype@hdr [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ....., ]
+   varno@body [2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4,.....,  ]
+   degrees(lat) [62.38, 62.38, 62.38, 61.97, 61.97, 61.97, 61.26,..., ]
+   degrees(lon) [1.1, 1.1, 1.1, 0.5, 0.5, 0.5, -0.35, -0.35, -0.35, -1.54,.... ,  ]
+   obsvalue@body [216.0, 28.72984, -2.00899, 214.2, 32.57982, -4.5788,...,]  }
 

@@ -8,6 +8,7 @@ from .exceptions   import  *
 m=pyodbErrMessage()
 msg_err=m._ErrMsg()
 
+
 __all__ = ["OdbEnv"]
 
 

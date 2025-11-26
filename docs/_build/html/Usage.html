@@ -47,7 +47,9 @@
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Dependencies.html">Dependencies</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#open-a-ccma-database">Open a CCMA database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-the-dca-direct-column-access-files">Create the DCA (Direct Column Access) files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#send-and-fetch-data-from-a-given-ecma-or-ccma">Send and fetch data from a given ECMA or CCMA</a></li>
 </ul>
 </li>
 </ul>
@@ -78,8 +80,8 @@
              
   <section id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
-<section id="example">
-<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<section id="open-a-ccma-database">
+<h2>Open a CCMA database<a class="headerlink" href="#open-a-ccma-database" title="Link to this heading"></a></h2>
 <p>The package pyodb is written in C/Python API. It contains a set of functions as an interface between python and ODB softeware.
 In order to open a given database one has to import the module “odbConnect”. Ths function returns positive value for a seccessful connection and negative if it fails.
 We consider the use of an CCMA odb (The same code  works also for ECMA )</p>
@@ -90,6 +92,26 @@ We consider the use of an CCMA odb (The same code  works also for ECMA )</p>
    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<section id="create-the-dca-direct-column-access-files">
+<h2>Create the DCA (Direct Column Access) files<a class="headerlink" href="#create-the-dca-direct-column-access-files" title="Link to this heading"></a></h2>
+<p>In order to fetch the columns and rows, the ODB creates the DCA files first. The latters contain the necessary information about how the data are written on the disk.Such as the starting memory segment and the end of a given table, the size and the offsets between the different tables and columns.</p>
+<p>The DCA files can be created on the fly when any of the binaries such as odbdump.x or odbsql.x are used. In the pyodb package a C/python function is used to create the files before the data fetch. Creating DCA files is relatiely simple,the user has to provide the path the ODB and the number of CPUs used by the task. The ODB path is requiered however, the number of CPUs and the verbosity arguments are optional. The DCA files are written uin a subdirectory  called “dca” inside the ECMA or CCMA directory.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check if the dca directory is already there</span>
+<span class="n">dbpath</span> <span class="o">=</span> <span class="s2">&quot;/path to/imaginary&quot;</span>
+<span class="n">db_type</span><span class="o">=</span> <span class="s2">&quot;CCMA&quot;</span>
+<span class="n">dcapath</span><span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">(</span> <span class="n">dbpath</span><span class="p">,</span><span class="n">db_type</span><span class="p">,</span> <span class="n">dcapth</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span> <span class="p">(</span><span class="n">dcapath</span> <span class="p">):</span>
+   <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;IOASSIGN &quot;</span><span class="p">]</span> <span class="o">=</span><span class="n">dbpath</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">db_type</span><span class="o">+</span><span class="s2">&quot;/IOASSIGN&quot;</span>
+   <span class="n">ic</span><span class="o">=</span><span class="n">odbDca</span> <span class="p">(</span> <span class="n">dbpath</span><span class="o">=</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span> <span class="n">db_type</span><span class="p">,</span> <span class="n">ncpu</span><span class="o">=</span><span class="mi">8</span>  <span class="p">)</span>  <span class="c1"># in this example 8 CPUs are used</span>
+   <span class="c1"># &#39;ic&#39; is used to check whether the process has successfully ended</span>
+   <span class="c1"># Returns a negative value if it fails and postive in success.</span>
+</pre></div>
+</div>
+</section>
+<section id="send-and-fetch-data-from-a-given-ecma-or-ccma">
+<h2>Send and fetch data from a given ECMA or CCMA<a class="headerlink" href="#send-and-fetch-data-from-a-given-ecma-or-ccma" title="Link to this heading"></a></h2>
 </section>
 </section>
 

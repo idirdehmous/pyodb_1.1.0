@@ -40,6 +40,8 @@ class StringParser:
 #  int ncols_nonassoc;     /* column variables needed to be prefetched due to formula(s) (kind=0) */
 #  int ncolaux;            /* Should be == ncols_true + ncols_aux */
 
+
+
       def ParseTokens(self, raw):
           fcnt=[]
           od  =OdbLexic ()
@@ -48,14 +50,14 @@ class StringParser:
           
           
           rr=raw.lower().split()                    # BE SURE THAT THE QUERY IS IN LOWER CASE 
-          rj="".join(rr).partition('from')          # JOIN EVERYTHING AND USE "from" KEYWORD AS SEPARATOR
+          rj="".join(rr).partition('from')          # JOIN EVERYTHING AND USE "from" KEYWORD AS DELIMITER
           tokens = rj[0:1]                          # THE SELECT STETEMENT IS AT INDEX 0 
           # GET built-in functions OCCURENCES WITH REGEX 
           # TEMPORARY LIST
           # FUNCTIONS NAMES ARE NOT CASE SENSITIVE IN THE ODB/SQL SYNTAX PARSER 
-          # Tokens are already in lower case , the functions names should also be !
+          # Tokens are already in lower case , the functions names should also !
           # Counting the number of functions is not for fun !  
-          # The ODB C code allocates N columns for pure select in query + N cols for the used functions ( it should be sustracted !)
+          # The ODB C code allocates N columns for pure select in query + N cols for the used functions ( it should be sustracted ! to avoid <NULL> in returned arrays )
 
           cnt=0
           for t in tokens:
@@ -68,6 +70,7 @@ class StringParser:
                     cnt = cnt + n_occur 
                 
           return cnt  
+
 
       def CleanString  (self , string ):
           # C characters not accepted in strings arguments 

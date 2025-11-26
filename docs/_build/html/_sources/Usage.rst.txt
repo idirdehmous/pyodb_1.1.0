@@ -14,4 +14,4 @@ We consider the use of an CCMA odb (The same code  works also for ECMA )
    if iret < 0 :
       print("Failed  to open the odb"  , dbpath )
       sys.exit(0)
-    
+

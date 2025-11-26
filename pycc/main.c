@@ -9,7 +9,7 @@
 
 
 
-// Define the function in the module 
+// Define the functions in the modules 
 static PyMethodDef module_methods[] = {
     {"odbConnect",  (PyCFunction)(void(*)(void))    odbConnect_method ,
      METH_VARARGS | METH_KEYWORDS,   "Create odb connection object and init its environment"},
@@ -36,7 +36,7 @@ static PyMethodDef module_methods[] = {
      METH_VARARGS | METH_KEYWORDS,   "Create DCA  (Direct Column  Access )   files "},
 
     {"odbGcdistance"  ,  (PyCFunction)(void(*)(void))      odbGcdistance_method   ,
-     METH_VARARGS | METH_KEYWORDS,   "Compute great circle distance between latlon pairs "},
+     METH_VARARGS | METH_KEYWORDS,   "Compute great circle distance between numpy latlon pairs "},
 
 };
 
@@ -45,16 +45,18 @@ static PyMethodDef module_methods[] = {
 static struct PyModuleDef   odbmodule = {
     PyModuleDef_HEAD_INIT,
     "pyodb",
-    "C/Python interface to access the ODB1 IFS/ARPEGE databases\nDeveloped after the ECMWF source code odb software (S. Saarinen 2000) !",
+    "C/Python interface to access the ODB1 IFS/ARPEGE databases\nThe original source code has been developed by Copyright (c) 1997-98, 2000 ECMWF. All Rights Reserved !",
     -1,
     module_methods ,
      .m_slots =NULL
 };
 
+
+
 // Called first during python call
 PyMODINIT_FUNC PyInit_pyodb (void) {
 
-    import_array();   //   Init  Numpy C API  ... Otherwise  segfaults are everywhere  :-)
+    import_array();   //   Init  Numpy C API  ... Otherwise  segfaults are everywhere  :-/
 
     PyObject*  m  ;
     PyObject* ModuleError ;

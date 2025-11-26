@@ -91,12 +91,14 @@ The function needs some requiered and optional arguments and are described herea
    print( data ) 
    
 
-   [##################################################] Complete 100%  (Total: 51 rows)
+Output :
 
-   {statid@hdr ['2YIQTRJA', '2YIQTRJA', '2YIQTRJA', 'ZUMAVXZA', 'ZUMAVXZA',....,    ]
-   obstype@hdr [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ....., ]
-   varno@body [2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4,.....,  ]
-   degrees(lat) [62.38, 62.38, 62.38, 61.97, 61.97, 61.97, 61.26,..., ]
-   degrees(lon) [1.1, 1.1, 1.1, 0.5, 0.5, 0.5, -0.35, -0.35, -0.35, -1.54,.... ,  ]
-   obsvalue@body [216.0, 28.72984, -2.00899, 214.2, 32.57982, -4.5788,...,]  }
+[##################################################] Complete 100%  (Total: 51 rows)
+
+{statid@hdr ['2YIQTRJA', '2YIQTRJA', '2YIQTRJA', 'ZUMAVXZA', 'ZUMAVXZA',....,    ]
+obstype@hdr [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ....., ]
+varno@body [2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4,.....,  ]
+degrees(lat) [62.38, 62.38, 62.38, 61.97, 61.97, 61.97, 61.26,..., ]
+degrees(lon) [1.1, 1.1, 1.1, 0.5, 0.5, 0.5, -0.35, -0.35, -0.35, -1.54,.... ,  ]
+obsvalue@body [216.0, 28.72984, -2.00899, 214.2, 32.57982, -4.5788,...,]  }
 

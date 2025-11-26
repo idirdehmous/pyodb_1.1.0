@@ -4,6 +4,7 @@ pyodb documentation
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-   usage
-   api
+   Introduction 
+   Installation 
+   Dependecies 
+   Usage 

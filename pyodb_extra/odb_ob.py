@@ -12,12 +12,13 @@ from   .exceptions   import *
 from   .odb_glossary import OdbLexic 
 
 
-
-# SOME INSTANTIATIONS 
+# INSTANTIATE 
 m=pyodbErrMessage()
 msg_err=m._ErrMsg()
 
 lex=OdbLexic ()
+
+
 
 class OdbObject:
       def __init__(self, path ):
@@ -70,6 +71,8 @@ class OdbObject:
             else:
                return None 
 
+
+
       @classmethod
       def HasIoassign(self, path, type_):
           if self.CheckExist(path ):
@@ -80,7 +83,6 @@ class OdbObject:
              if os.path.islink ( sym_file ):
                 return sym_file 
 
-#                  mfodb/ECMA.iasi/ECMA.IOASSIGN
       @classmethod
       def HasIomap (self , path , type_):
           if self.CheckExist(path ):
@@ -103,6 +105,7 @@ class OdbObject:
           # TOTAL IN Bytes
           return total 
 
+
       @classmethod       
       def GetPools(self, path ):
           pools=[]
@@ -116,6 +119,7 @@ class OdbObject:
                         pools.append(pattern[i])
 
           return pools 
+
 
       @classmethod 
       def GetTables(self, path):

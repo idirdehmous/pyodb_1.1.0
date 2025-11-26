@@ -23,37 +23,12 @@ endif()
 
 ecbuild_declare_project()
 
-#ecbuild_add_option(FEATURE OMP
-#  DESCRIPTION "Support for OpenMP multi-threading"
-#  REQUIRED_PACKAGES "OMP COMPONENTS C"
-#  DEFAULT ON)
-
-#if(HAVE_OMP)
-#  ecbuild_enable_omp()
-#endif()
-
-#ecbuild_add_option(FEATURE ODB_MPI
-#  DESCRIPTION "Use system MPI library"
-#  REQUIRED_PACKAGES MPI
-#  DEFAULT OFF)
-
-#ecbuild_add_option(FEATURE ODB_EMOS
-#  DESCRIPTION "Use system EMOS library"
-#  REQUIRED_PACKAGES libemos
-#  DEFAULT OFF)
-
 ecbuild_add_option(FEATURE ODB_SHARED_LIBS
   DESCRIPTION "Build ODB project with shared libraries (overrides BUILD_SHARED_LIBS)"
   DEFAULT ${BUILD_SHARED_LIBS}
   ADVANCED)
 
 set(BUILD_SHARED_LIBS ${ENABLE_ODB_SHARED_LIBS})
-
-#option(ODB_CLIENT_SERVER "Enable client/server support" OFF)
-
-#if(ODB_CLIENT_SERVER AND HAVE_ODB_SHARED_LIBS)
-#  message(FATAL_ERROR "Please set BUILD_SHARED_LIBS or ENABLE_ODB_SHARED_LIBS to OFF for client/server support")
-#endif()
 
 test_big_endian(BIG_ENDIAN)
 
@@ -148,8 +123,6 @@ ecbuild_find_project_files()
 
 add_subdirectory(cmake)
 add_subdirectory(src)
-#add_subdirectory(share)
-#add_subdirectory(tests)
 
 ecbuild_install_project(NAME odb)
 ecbuild_print_summary()

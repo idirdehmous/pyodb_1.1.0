@@ -52,10 +52,10 @@ class BuildModule:
         lib_dir = _auto_load_lib()
         print(f"Using ODB lib in: {lib_dir}")
 
-        extra_compile_args = [ "-O3", "-ffast-math" , "-fPIC", "-Wall"   , "-Wextra",
-                               "-Wsign-compare"   , "-Waddress",
-                               "-Wunused-variable", "-v" 
-        ]
+        extra_compile_args = ["-O2" ,"-fPIC", "-Wall", "-Wextra", 
+                      "-Wsign-compare", "-Waddress"     , 
+                      "-Wunused-variable", "-v"  ]
+        
 
         extra_link_args = [
             f"-Wl,-rpath,{lib_dir}"

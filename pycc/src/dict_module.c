@@ -1,6 +1,4 @@
 #define PY_SSIZE_T_CLEAN
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-
 //NUMPY API 
 #include <numpy/arrayobject.h>
 #include <numpy/ndarraytypes.h>
@@ -27,7 +25,6 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
                                  PyObject *kwargs) {
 
     // Arguments keywords
-    import_array()  ;
     char *database  = NULL;
     char *sql_query = NULL;
     int   fcols     = 0;
@@ -85,13 +82,13 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
 
     // Check number of rows --> check the query answer 
     if ( total_rows ==0 ) {
-      PyErr_SetString(PyExc_RuntimeError, "--pyodb : The SQL request returned zero rows.");  
+      PyErr_SetString(PyExc_RuntimeError, "--odb4py : The SQL request returned zero rows.");  
       return NULL ;  }
     if (total_rows == 0)
     {
         // Specific Exception to  catche in python 
         PyErr_Format(PyOdbEmptyResultError,
-                     "pyodb: SQL query returned zero rows "
+                     "odb4py : SQL query returned zero rows "
                      "(database=%s, query=\"%s\")",
                      database ? database : "(null)",
                      sql_query ? sql_query : "(null)");
@@ -109,21 +106,21 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
         else if (queryfile)
             printf("Executing query from file   : %s\n", queryfile);
     }
-    //   OPEN ODB ( isolate the thread for pur C . No python object is allowed to be created here .Python  GIL unlocked)
-    //Py_BEGIN_ALLOW_THREADS  
+    //  OPEN ODB
     h = odbdump_open(database, sql_query, queryfile, poolmask, varvalue, &maxcols);
-    //Py_END_ALLOW_THREADS
+    
     if (!h || maxcols <= 0) {
-        PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to open ODB or invalid number of columns");
+        PyErr_SetString(PyExc_RuntimeError, "--odb4py : Failed to open ODB or invalid number of columns");
         return NULL  ; }
+
     // Number of columns taking into account the number of functions in the query  (col pure - n columns function)
     int ncols = maxcols - fcols;
     // Allocation 
     double *buffer    = (double *)malloc(sizeof(double) * (size_t)total_rows * (size_t)ncols);
     char  **strbufs   = (char**)calloc((size_t)ncols, sizeof(char*));
     // If allocation failed  close !
-    if (!buffer) { odbdump_close(h);  PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to allocate memory buffer for numeric values ");  return NULL ;  }
-    if (!strbufs){ odbdump_close(h);  PyErr_SetString(PyExc_RuntimeError, "--pyodb : Failed to allocate memory buffer for string  values ");  return NULL ;  }
+    if (!buffer) { odbdump_close(h);  PyErr_SetString(PyExc_RuntimeError, "--odb4py : Failed to allocate memory buffer for numeric values ");  return NULL ;  }
+    if (!strbufs){ odbdump_close(h);  PyErr_SetString(PyExc_RuntimeError, "--odb4py : Failed to allocate memory buffer for string  values ");  return NULL ;  }
     if (verbose)   printf("Number of requested columns : %d\n", ncols);
    // Internal ODB vars 
     int new_dataset = 0;
@@ -141,24 +138,26 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
    // List to hold the column names  and values 
    PyObject **col_lists        = (PyObject **)malloc(ncols * sizeof(PyObject *));
    if (!col_lists) { 
-	PyErr_SetString(PyExc_RuntimeError, "--pyodb : PyObject memory allocation error");  
+	PyErr_SetString(PyExc_RuntimeError, "--odb4py : PyObject memory allocation error");  
 	return NULL  ;
    }
    // Dict object 
    PyObject  *dict = PyDict_New();
    if (!dict) {
-      PyErr_SetString(PyExc_RuntimeError, "--pyodb : PyObject dictionary allocation error");
+        PyErr_SetString(PyExc_RuntimeError, "--odb4py : PyObject dictionary allocation error");
        return NULL  ; 
     }
+
    // Init buffer strings 
    for (int i = 0; i < ncols; ++i) {
     strbufs[i] = (char*)calloc((size_t)total_rows, (size_t)ODB_STRLEN +1);
     }
+
     // Init columns lists 
     for (int i = 0; i < ncols; ++i) {
         col_lists[i] = PyList_New(total_rows);
         if (!col_lists[i]) {
-            PyErr_SetString(PyExc_RuntimeError, "--pyodb : PyObject memory allocation error");
+            PyErr_SetString(PyExc_RuntimeError, "--odb4py : PyObject memory allocation error");
              return NULL  ; 
         } }
     // Loop over the rows    
@@ -189,13 +188,9 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
             colinfo_t *pci    = &ci[i];
             PyObject  *value  =  NULL ;
            if (print_mdi && pci->dtnum != DATATYPE_STRING && ABS(d[i]) == mdi) {
-              /*char *dst = &strbufs[i][(size_t)row_idx * ODB_STRLEN];
-              memset(dst, , ODB_STRLEN);
-              strncpy(dst, NAN , ODB_STRLEN - 1);
-              value = PyUnicode_FromStringAndSize(dst, strnlen(dst , ODB_STRLEN));*/
-         	  value = Py_None  ; 
-                  Py_INCREF(Py_None)  ; 
-
+         	  //value = Py_None  ; 
+                  //Py_INCREF(Py_None)  ;   Gives None in pandas ,not suitable 
+                  value = PyFloat_FromDouble(NAN);   //  use NAN     
           } else {
               switch (pci->dtnum) {
             	case DATATYPE_STRING: {
@@ -207,8 +202,9 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
 			if ( dst ) 
 			{ value = PyUnicode_FromStringAndSize(dst, strnlen(dst, ODB_STRLEN));			      
 			}else {
-//				value = PyUnicode_FromStringAndSize("NULL", );
-				value = PyUnicode_FromFormat ("NULL    ")  ; 
+				//value = PyUnicode_FromFormat ("NULL    ")  ; 
+                                value = Py_None   ;
+			        Py_INCREF(Py_None);	
 				}
                 break;
 	             }
@@ -230,7 +226,6 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
                float_val   =  (double)d[i];
 	       double fval =  format_float ( float_val , fmt_float);
 	       buffer[(size_t)row_idx * (size_t)ncols + (size_t)i] = (double) fval  ;
-               //value = PyLong_FromLong(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
                value = PyFloat_FromDouble(buffer[(size_t)row_idx * (size_t)ncols + (size_t)i]);
                break;
         }   // switch  
@@ -244,7 +239,7 @@ if (row_idx < total_rows  ) {
     PyList_SET_ITEM(col_lists[i], row_idx, value);
        } else {
     PyList_Append(col_lists[i], value);
-    Py_DECREF(value);   // "Decref the reference object"
+    Py_DECREF(value);   // "DECREF  the reference object"
          }
       }   // cols  
         ++row_idx;

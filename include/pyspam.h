@@ -19,8 +19,8 @@
 
 
 // BUILD THE DATA TYPE STRING 
- static PyObject* makeString_data (char *data, npy_intp n, int N) {
-    // FOR Python >= 3.12 
+/* static PyObject* makeString_data (char *data, npy_intp n, int N) {
+   // FOR Python >= 3.12 
     PyArray_Descr *descr = PyArray_DescrNewFromType(NPY_STRING);
     #if NPY_ABI_VERSION < 0x2000000
          descr->elsize = N;
@@ -32,7 +32,7 @@
     // Strides NULL => contigu with stride = elsize = 8
     PyObject *arr = PyArray_NewFromDescr(&PyArray_Type, descr,1, dims, NULL,(void*)data, 0, NULL);
     return arr;
-}
+}*/
 
 
 

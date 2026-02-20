@@ -85,7 +85,7 @@ void sp_dists(double *u, double *v, double *uout, double *vout, int *n, double *
 
 
 
-static PyObject* odbGcdistance_method( PyObject* Py_UNUSED(self) , PyObject* args)
+static PyObject* odbGcdist_method( PyObject* Py_UNUSED(self) , PyObject* args)
 {
     import_array()
     PyObject      *lon1_obj  , *lat1_obj , *lon2_obj, *lat2_obj;

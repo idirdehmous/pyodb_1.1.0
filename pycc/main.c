@@ -26,7 +26,7 @@ static PyMethodDef module_methods[] = {
     {"odbFunctions",  (PyCFunction)(void(*)(void))  odbFunctions_method ,
      METH_VARARGS | METH_KEYWORDS,   "Print all the possible functions that could be used in ODB sql statement"},
 
-    {"odbFetch" ,  (PyCFunction)(void(*)(void))     odbFetch_method ,
+    {"odbFetchnum" ,  (PyCFunction)(void(*)(void))     odbFetchnum_method ,
      METH_VARARGS | METH_KEYWORDS,   "Fetch rows from a given ECMA or CCMA ODB database given sql query. This function returns a numpy. Suitable to speed up the selection if there only numeric data types in the query"},
 
     {"odbDict" ,  (PyCFunction)(void(*)(void))   odbDict_method ,
@@ -35,7 +35,7 @@ static PyMethodDef module_methods[] = {
     {"odbDca"  ,  (PyCFunction)(void(*)(void))      odbDca_method   ,
      METH_VARARGS | METH_KEYWORDS,   "Create DCA  (Direct Column  Access )   files "},
 
-    {"odbGcdistance"  ,  (PyCFunction)(void(*)(void))      odbGcdistance_method   ,
+    {"odbGcdist"  ,  (PyCFunction)(void(*)(void))      odbGcdist_method   ,
      METH_VARARGS | METH_KEYWORDS,   "Compute great circle distance between numpy latlon pairs "},
 
 };

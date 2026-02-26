@@ -149,10 +149,10 @@ static PyObject * odbDca_method(PyObject *Py_UNUSED(self), PyObject *args, PyObj
     char cmd  [4096]  ;
     char cpu_str[32]  ;
 
+
     // Concat  
     snprintf(cpu_str, sizeof(cpu_str), "%d", ncpu);
     snprintf(cmd, sizeof(cmd), "%s/dcagen -i '%s' -N %s -q -z -P", bebin, dbpath, cpu_str);
-
 
     if (extra && strlen(extra) > 0) {
         strncat(cmd, " ", sizeof(cmd)-strlen(cmd)-1);
@@ -188,6 +188,14 @@ if ( tables &&  PySequence_Check(tables)) {
 
     // Unlock python GIL for another process 
     Py_BEGIN_ALLOW_THREADS
+
+
+    // Path
+    // Can't be seen by the children processes  
+    // The env is set in dcagen script itself   
+    //const char *new_path = getenv("PATH");
+    //setenv("PATH", new_path  , 1);
+
     status = system(cmd);
     // relock GIL 
     Py_END_ALLOW_THREADS

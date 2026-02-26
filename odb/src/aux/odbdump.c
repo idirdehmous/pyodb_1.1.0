@@ -52,19 +52,20 @@ PRIVATE FILE *f_stderr = NULL; /* not thread safe */
   @param filename     Filename where stderr will be redirected
   @param mode         Opening mode ("w" by default)
  */
-PUBLIC void
-odbdump_reset_stderr(FILE *fp, const char *filename, const char *mode)
+PUBLIC void odbdump_reset_stderr(FILE *fp, const char *filename, const char *mode)
 {
-  if (!f_stderr) {
+  /*if (!f_stderr) {
     /* Get rid of unnecessary stderr-output by
        redirecting "stderr" to the filename (or /dev/null if cannot open).
-       Do only once */
+       Do only once 
     if (!fp) fp = stderr;
     if (!filename) filename = "pyodb.stderr";
     if (!mode) mode = "w";
     f_stderr = freopen(filename, mode, fp);
     if (!f_stderr) f_stderr = freopen("/dev/null", mode, fp);
-  }
+     }*/
+
+     printf("%s\n", "")  ; 
 }
 
 

@@ -50,8 +50,21 @@ set -eu
 #=======================================================================
 #end
 
+
+
+# In the context of odb4py ,these scripts are launched by other processes (  C functions  or  python env )
+# To avoid any inconsistency between the differents environnments, the scripts look for their own path and 
+# pick up the PATH and the other ODB vars 
+#
+script_dir=$(realpath "$0")
+env_file=$( echo ${script_dir%/*} )
+. ${env_file}/set_env.sh
+
+
 cmd=$(\cd $(dirname $0); echo $(pwd))/$(basename $0)
 thisdir=$(pwd)
+
+
 
 if [[ $# -gt 0 ]] ; then
   ARGS="${cmd} $*"
@@ -64,6 +77,8 @@ USAGE="$USAGE [-i dbdir] [-v] [-N cpus] [-b] [-B bufsiz] [-z] [-g]"
 USAGE="$USAGE [-c col@table] [-C col@table] [-q] [-x] [-m] [-Q] [-o output_file_prefix]"
 USAGE="$USAGE [-D cache_disk] [-a] [-A] [-I] [-P] [-e errlog] [-E errlog]"
 
+
+#set -x 
 dbname=""
 tables=""
 force2continue=0
@@ -134,6 +149,7 @@ do
     *) errflg=1;;
   esac
 done
+
 
 if [[ $extract -eq 1 ]] ; then
   extract_arg="-x"
@@ -218,6 +234,19 @@ fi
 
 dcadir_in=$dbdir/dca
 dcadir_out=$dbdir/dca
+
+
+# Self PATH exporting         
+#bodb4pybin=$(realpath "$0")
+#exedir=$( echo ${bodb4pybin%/*} )
+#PATH=${PATH}:${exedir}
+#case ":$PATH:" in
+#  *":$exedir:"*) ;;
+#  *) PATH="${PATH}:${exedir}" ;;
+#esac
+#export PATH
+
+
 
 if [[ $create_Ioassign -eq 1 && ! -f $dbdir/$dbname.IOASSIGN ]] ; then
   #-- Make sure $dbdir/$dbname.IOASSIGN exists

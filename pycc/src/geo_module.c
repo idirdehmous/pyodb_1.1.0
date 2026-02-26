@@ -7,7 +7,23 @@
 #include <float.h>
 #define PYPRINT(o)  PyObject_Print(o, stdout, 0); printf("\n");
 
+// Define Pi ifndef 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+// Convert Degree to Radian
+#define DEG2RAD(deg) ((deg) * M_PI / 180.0)
+
+// Convert Radian to Degree
+#define RAD2DEG(rad) ((rad) * 180.0 / M_PI)
+
+// Power 
 #define POWDI(x,i) pow(x,i)
+
+
+
+
 
 void sp_gcdist(double *lon1, double *lon2, double *lat1, double *lat2, double *dist)
 {
@@ -176,4 +192,111 @@ static PyObject* odbGcdist_method( PyObject* Py_UNUSED(self) , PyObject* args)
     Py_DECREF(lat2);
     Py_DECREF(lon2);
     return (PyObject*)distmat;
+}
+
+
+
+
+
+
+
+// Get lat/lon/obsvalue , according to an additional sql statement 
+static PyObject * odbGeopoints_method(PyObject *self, PyObject *args, PyObject *kwargs) {
+
+   char *database  = NULL;
+   char *sql_add   = NULL;
+   char *poolmask  = NULL;
+   int  fmt_float  = 15  ;
+
+
+    // Boolean args
+    PyObject *extent_obj  = Py_None;
+    PyObject *pdegree     = Py_None;
+    PyObject *pbar        = Py_None;
+    PyObject *pverb       = Py_None;
+   
+    // Add a reference mannually  
+    Py_INCREF( extent_obj );
+    Py_INCREF( pdegree    );
+    Py_INCREF( pbar       );
+    Py_INCREF( pverb      );
+
+    
+   static char *kwlist[] = {  "database" , 
+	                      "sql_add"  ,
+			      "degrees"  ,  
+			      "extent"   ,
+			      "fmt_float", 
+			      "poolmask" , 
+			      "pbar"     ,
+			      "verbose",  NULL };
+
+    // Parse keyword args 
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|sOOizOO", kwlist,  
+                                     &database,
+                                     &sql_add ,
+				     &pdegree  ,
+				     &extent_obj  ,
+                                     &fmt_float,
+                                     &poolmask ,
+                                     &pbar     ,
+                                     &pverb)) {
+         return NULL  ;
+    }
+
+    Bool ldegree = false;
+    Bool lpbar   = false;
+    Bool verbose = false;
+
+    // Conversion to boolean C variable
+    lpbar    = PyObj_ToBool ( pbar    , lpbar     );
+    verbose  = PyObj_ToBool ( pverb   , verbose   );
+    ldegree  = PyObj_ToBool ( pdegree , ldegree   );
+
+
+
+   double lon1, lon2, lat1, lat2;
+
+   if (extent_obj != Py_None) {
+      if (!PySequence_Check(extent_obj) || PySequence_Size(extent_obj) != 4)
+      {
+        PyErr_SetString(PyExc_ValueError,       "--odb4py : Extent must be a list : [lon1,lon2,lat1,lat2]");
+        return NULL;
+      }
+
+    lon1 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,0));
+    lon2 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,1));
+    lat1 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,2));
+    lat2 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,3));
+
+    printf("%s %f %f %f %f \n" , "ldegree = False" ,lat1, lat2, lon1, lon2 ) ; 
+    if (ldegree) {
+        lon1 *= M_PI/180.0;
+        lon2 *= M_PI/180.0;
+        lat1 *= M_PI/180.0;
+        lat2 *= M_PI/180.0;
+    printf( "%s     %f %f %f %f \n" , "ldegree = True " ,    lat1, lat2, lon1, lon2 ) ; 
+    }
+}
+
+char bbox[512];
+lon1=0.  ;
+lon2=35.0;
+lat1=0.  ;
+lat2=80. ;
+
+// Use  degrees  for the bbox selection  ,  despite  extent is in radians or degrees 
+//snprintf(bbox,sizeof(bbox), "lat@hdr BETWEEN %f AND %f AND " "lon@hdr BETWEEN %f AND %f",lat1, lat2, lon1, lon2);
+//printf(  "%s\n"  , bbox   ) ; 
+
+/*
+if (ldegree) {
+    double *data = PyArray_DATA(array);
+
+    for (npy_intp i=0;i<nrows;i++) {
+        data[i*ncols+0] *= RAD2DEG;
+        data[i*ncols+1] *= RAD2DEG;
+    }
+}*/
+return PyLong_FromLong(0) ; 
 }

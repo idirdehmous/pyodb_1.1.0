@@ -59,13 +59,12 @@ PUBLIC void odbdump_reset_stderr(FILE *fp, const char *filename, const char *mod
        redirecting "stderr" to the filename (or /dev/null if cannot open).
        Do only once 
     if (!fp) fp = stderr;
-    if (!filename) filename = "pyodb.stderr";
+    if (!filename) filename = "odbdump.stderr";
     if (!mode) mode = "w";
     f_stderr = freopen(filename, mode, fp);
     if (!f_stderr) f_stderr = freopen("/dev/null", mode, fp);
      }*/
-
-     printf("%s\n", "")  ; 
+    (void) 0 ;
 }
 
 

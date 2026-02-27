@@ -315,7 +315,7 @@ codb_init_poolmask_(const int *handle,
 		"***INFO: Poolmasking ignored altogether for database '%s'\n",
 		p_dbname);*/
    // disable printing this line  
-      printf("%s\n",  ""); 
+   (void) 0 ; 
   }
   else if (maxval > 0) {
     poolmasking = 1;

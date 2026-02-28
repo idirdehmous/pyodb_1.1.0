@@ -8,6 +8,8 @@
 #include "rows.h"
 #include "progress.h"
 
+
+
 // odbArray  : numeric-only fetch  ---->  returns numpy.ndarray
 // The variables type 'string' are ignored  
 static PyObject * odbArray_method(PyObject *Py_UNUSED(self), PyObject *args, PyObject *kwargs)
@@ -152,7 +154,6 @@ static PyObject * odbArray_method(PyObject *Py_UNUSED(self), PyObject *args, PyO
              // header 
              if (lheader) {
                 header_list = PyList_New(0);
-                int h = 0  ; 
                 for (int i = 0; i < nci; ++i) {
 
                    if (ci[i].dtnum == DATATYPE_STRING)   continue;

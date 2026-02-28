@@ -54,7 +54,11 @@ PRIVATE FILE *f_stderr = NULL; /* not thread safe */
  */
 PUBLIC void odbdump_reset_stderr(FILE *fp, const char *filename, const char *mode)
 {
-  /*if (!f_stderr) {
+  /*  In the context of odb4py  this function is switched 
+   *  otherwise ,user can see the python stderr on the screen 
+   *  can lead to some mis interpretation of the scripts outputs 
+   *
+   * if (!f_stderr) {
     /* Get rid of unnecessary stderr-output by
        redirecting "stderr" to the filename (or /dev/null if cannot open).
        Do only once 

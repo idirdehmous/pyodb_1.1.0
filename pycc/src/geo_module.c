@@ -24,7 +24,6 @@
 
 
 
-
 void sp_gcdist(double *lon1, double *lon2, double *lat1, double *lat2, double *dist)
 {
     double F, G, L, sinG2, cosG2, sinF2, cosF2, sinL2, cosL2, S, C;
@@ -196,107 +195,229 @@ static PyObject* odbGcdist_method( PyObject* Py_UNUSED(self) , PyObject* args)
 
 
 
+typedef struct {
+    PyObject *parts;   // liste Python de morceaux SQL
+} SQLBuilder;
+
+static SQLBuilder *
+sqlbuilder_new(void)
+{
+    SQLBuilder *b = PyMem_Malloc(sizeof(SQLBuilder));
+    if (!b) return NULL;
+    b->parts = PyList_New(0);
+    if (!b->parts) {
+        PyMem_Free(b);
+        return NULL;
+    }
+    return b;
+}	
+
+
+static int sqlbuilder_add(SQLBuilder *b, const char *text)
+{
+    PyObject *s = PyUnicode_FromString(text);
+    if (!s) return -1;
+    int rc = PyList_Append(b->parts, s);
+    Py_DECREF(s);
+    return rc;
+}
 
 
 
+static int
+sqlbuilder_addf(SQLBuilder *b, const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
 
-// Get lat/lon/obsvalue , according to an additional sql statement 
-static PyObject * odbGeopoints_method(PyObject *self, PyObject *args, PyObject *kwargs) {
+    va_list args_copy;
+    va_copy(args_copy, args);
 
-   char *database  = NULL;
-   char *sql_add   = NULL;
-   char *poolmask  = NULL;
-   int  fmt_float  = 15  ;
+    int needed = vsnprintf(NULL, 0, fmt, args_copy);
+    va_end(args_copy);
 
-
-    // Boolean args
-    PyObject *extent_obj  = Py_None;
-    PyObject *pdegree     = Py_None;
-    PyObject *pbar        = Py_None;
-    PyObject *pverb       = Py_None;
-   
-    // Add a reference mannually  
-    Py_INCREF( extent_obj );
-    Py_INCREF( pdegree    );
-    Py_INCREF( pbar       );
-    Py_INCREF( pverb      );
-
-    
-   static char *kwlist[] = {  "database" , 
-	                      "sql_add"  ,
-			      "degrees"  ,  
-			      "extent"   ,
-			      "fmt_float", 
-			      "poolmask" , 
-			      "pbar"     ,
-			      "verbose",  NULL };
-
-    // Parse keyword args 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|sOOizOO", kwlist,  
-                                     &database,
-                                     &sql_add ,
-				     &pdegree  ,
-				     &extent_obj  ,
-                                     &fmt_float,
-                                     &poolmask ,
-                                     &pbar     ,
-                                     &pverb)) {
-         return NULL  ;
+    if (needed < 0) {
+        va_end(args);
+        return -1;
     }
 
-    Bool ldegree = false;
+    char *buffer = PyMem_Malloc(needed + 1);
+    if (!buffer) {
+        va_end(args);
+        return -1;
+    }
+
+    vsnprintf(buffer, needed + 1, fmt, args);
+    va_end(args);
+
+    PyObject *s = PyUnicode_FromString(buffer);
+    PyMem_Free(buffer);
+
+    if (!s)
+        return -1;
+
+    int rc = PyList_Append(b->parts, s);
+    Py_DECREF(s);
+
+    return rc;
+}
+
+
+
+
+
+
+static PyObject *sqlbuilder_build(SQLBuilder *b)
+{
+    PyObject *empty = PyUnicode_FromString("");
+    if (!empty) return NULL;
+
+    PyObject *sql = PyUnicode_Join(empty, b->parts);
+    Py_DECREF(empty);
+    return sql;
+}
+
+static void sqlbuilder_free(SQLBuilder *b){
+    if (!b) return;
+    Py_XDECREF(b->parts);
+    PyMem_Free(b);
+}
+
+
+
+// Get  geopoints :  lat/lon and obsvalue 
+static PyObject *odbGeopoints_method(PyObject *self, PyObject *args, PyObject *kwargs)
+{
+    char *database  = NULL;
+    char *sql_cond  = NULL;
+    char *unit      = "radians";
+    int fmt_float = 15;
+
     Bool lpbar   = false;
     Bool verbose = false;
 
-    // Conversion to boolean C variable
-    lpbar    = PyObj_ToBool ( pbar    , lpbar     );
-    verbose  = PyObj_ToBool ( pverb   , verbose   );
-    ldegree  = PyObj_ToBool ( pdegree , ldegree   );
+    PyObject *extent_obj = Py_None;
+    PyObject *pbar  = Py_False;
+    PyObject *pverb = Py_False;
 
 
+    static char *kwlist[] = {
+        "database",
+        "sql_cond",
+        "unit",
+        "extent",
+        "fmt_float",
+        "pbar",
+        "verbose",
+        NULL
+    };
 
-   double lon1, lon2, lat1, lat2;
-
-   if (extent_obj != Py_None) {
-      if (!PySequence_Check(extent_obj) || PySequence_Size(extent_obj) != 4)
-      {
-        PyErr_SetString(PyExc_ValueError,       "--odb4py : Extent must be a list : [lon1,lon2,lat1,lat2]");
+    if (!PyArg_ParseTupleAndKeywords(
+            args, kwargs,
+            "s|ssOiOO",
+            kwlist,
+            &database,
+            &sql_cond,
+            &unit,
+            &extent_obj,
+            &fmt_float,
+            &pbar,
+            &pverb))
         return NULL;
-      }
 
-    lon1 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,0));
-    lon2 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,1));
-    lat1 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,2));
-    lat2 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,3));
 
-    printf("%s %f %f %f %f \n" , "ldegree = False" ,lat1, lat2, lon1, lon2 ) ; 
-    if (ldegree) {
-        lon1 *= M_PI/180.0;
-        lon2 *= M_PI/180.0;
-        lat1 *= M_PI/180.0;
-        lat2 *= M_PI/180.0;
-    printf( "%s     %f %f %f %f \n" , "ldegree = True " ,    lat1, lat2, lon1, lon2 ) ; 
-    }
+    
+    // Conversion to boolean C variable
+    lpbar   = PyObj_ToBool ( pbar , lpbar      ) ;
+    verbose = PyObj_ToBool ( pverb , verbose   ) ;
+
+    // Number of functions in SQL 
+    int  nfunc = 0 ;
+    // Keywords dict for fetch  
+    PyObject *key_args = PyDict_New();
+
+
+// Declare a new sl statement 
+SQLBuilder *sqlb = sqlbuilder_new();
+if (!sqlb)
+    return PyErr_NoMemory();
+
+// The geo point first select statement 
+// If in degrees 
+if (unit && strcmp(unit,"degrees")==0){
+sqlbuilder_add(sqlb,  "SELECT degrees(lat), degrees(lon), obsvalue FROM hdr, body WHERE 1=1");
+nfunc  = 2  ;   
+} else if (unit && strcmp(unit,"radians")==0  ) {
+sqlbuilder_add(sqlb,  "SELECT lat, lon, obsvalue FROM hdr, body WHERE 1=1");
+nfunc =0  ; 
 }
 
-char bbox[512];
-lon1=0.  ;
-lon2=35.0;
-lat1=0.  ;
-lat2=80. ;
-
-// Use  degrees  for the bbox selection  ,  despite  extent is in radians or degrees 
-//snprintf(bbox,sizeof(bbox), "lat@hdr BETWEEN %f AND %f AND " "lon@hdr BETWEEN %f AND %f",lat1, lat2, lon1, lon2);
-//printf(  "%s\n"  , bbox   ) ; 
-
-/*
-if (ldegree) {
-    double *data = PyArray_DATA(array);
-
-    for (npy_intp i=0;i<nrows;i++) {
-        data[i*ncols+0] *= RAD2DEG;
-        data[i*ncols+1] *= RAD2DEG;
+// Get a subdomain  
+if (extent_obj != Py_None) {
+    if (!PySequence_Check(extent_obj) || PySequence_Size(extent_obj) != 4)
+    {
+        PyErr_SetString(PyExc_ValueError, "--odb4py : extent must be a list : [lon1, lon2, lat1, lat2]");
+        return NULL;
     }
-}*/
-return PyLong_FromLong(0) ; 
+
+    // Get bbox 
+    double lon1 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,0));
+    double lon2 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,1));
+    double lat1 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,2));
+    double lat2 = PyFloat_AsDouble(PySequence_GetItem(extent_obj,3));
+
+  // Add SQL boundary box   
+    sqlbuilder_addf(sqlb,
+    " AND lat BETWEEN %.10g AND %.10g"
+    " AND lon BETWEEN %.10g AND %.10g",
+    lat1, lat2, lon1, lon2);
+
+}
+
+
+// Add SQL parts 
+if (sql_cond && strlen(sql_cond) > 0) { 
+   sqlbuilder_addf(sqlb,  " AND %s ", sql_cond);
+}
+
+// Get the SQL statement string and  free 
+PyObject *sql_obj = sqlbuilder_build(sqlb);
+sqlbuilder_free(sqlb);
+
+if (!sql_obj)
+    return NULL;
+const char *geo_sql = PyUnicode_AsUTF8(sql_obj);
+
+
+// Insert to a dict object  
+PyDict_SetItemString(key_args, "sql_query", sql_obj);
+
+// Required 
+PyDict_SetItemString(key_args, "database", PyUnicode_FromString(database));
+PyDict_SetItemString(key_args, "nfunc",PyLong_FromLong(nfunc ));
+
+
+// Optional  args 
+// Format floats
+PyDict_SetItemString(key_args, "fmt_float",PyLong_FromLong(fmt_float));
+// Progress bar  
+PyDict_SetItemString(key_args, "pbar",     lpbar   ? Py_True : Py_False);
+// Verbosity 
+PyDict_SetItemString(key_args, "verbose",  verbose ? Py_True : Py_False);
+
+// Quick print of the PyObject dict //PyObject_Print( key_args , stdout , 0 ) ; 
+
+
+// Create empty tuple as posional arguments 
+PyObject *args_call = PyTuple_New(0);
+
+PyObject *rows   = odbDict_method  ( NULL , args_call , key_args )  ;  
+
+if (!rows ) {
+    Py_DECREF(args_call);
+    return NULL;
+} else {
+ return rows   ;  
+}
+
 }

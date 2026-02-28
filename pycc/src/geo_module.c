@@ -208,7 +208,7 @@ static PyObject *odbGeopoints_method(PyObject *Py_UNUSED(self) , PyObject *args,
 {
     char *database  = NULL;
     char *sql_cond  = NULL;
-    char *unit      = "radians";
+    char *unit      = "degrees";
     int fmt_float = 15;
 
     Bool lpbar   = false;
@@ -286,15 +286,15 @@ if (extent_obj != Py_None) {
 
   // Add SQL boundary box   
     sqlbuilder_addf(sqlb,
-    " AND lat BETWEEN %.10g AND %.10g"
-    " AND lon BETWEEN %.10g AND %.10g",
+    " AND lat BETWEEN %.10g AND %.10g "
+    " AND lon BETWEEN %.10g AND %.10g ",
     lat1, lat2, lon1, lon2);
 
 }
 
 // Add SQL parts 
 if (sql_cond && strlen(sql_cond) > 0) { 
-   sqlbuilder_addf(sqlb,  " AND %s ", sql_cond);
+   sqlbuilder_addf(sqlb,  " AND  %s  ", sql_cond);
 }
 
 // Get the SQL statement string and  free 

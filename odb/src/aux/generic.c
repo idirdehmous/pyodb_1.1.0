@@ -62,12 +62,14 @@ ODBc_get_free_handles(int *Maxhandle)
     if (eq) { \
       *eq = '\0'; \
       env = getenv(penv); \
-      fprintf(stderr,"%s=%s\n",penv,env?env:NIL); \
       if (env) { FREE(x##_dbname); x##_dbname = STRDUP(env); } \
     } \
     FREE(penv); \
   } \
 }
+
+// Moved from the macro above 
+//fprintf(stderr,"%s=%s\n",penv,env?env:NIL); 
 
 
 PUBLIC int 

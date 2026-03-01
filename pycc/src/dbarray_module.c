@@ -18,13 +18,12 @@ static PyObject * odbArray_method(PyObject *Py_UNUSED(self), PyObject *args, PyO
 
     char *database  = NULL;
     char *sql_query = NULL;
-//    int   fcols     = 0;
     char *queryfile = NULL;
-    char *poolmask  = NULL;
     int   fmt_float = 15  ;   // N decimal in float 
     
 
-
+    // Objects 
+    PyObject* poolmask_obj  = Py_None  ;  
     // Boolean args 
     PyObject *phead = Py_None;
     PyObject *pbar  = Py_None;
@@ -43,27 +42,39 @@ static PyObject * odbArray_method(PyObject *Py_UNUSED(self), PyObject *args, PyO
     static char *kwlist[] = {"database","sql_query", "fmt_float", "queryfile", "poolmask","pbar" , "verbose","header",  NULL};
 
     // Parse keyword args 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ss|izzOOO", kwlist,   // 2 requiered , 6 optional 
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ss|izOOOO", kwlist,   // 2 requiered , 6 optional 
                                      &database,
                                      &sql_query,
 //                                     &fcols    ,
                                      &fmt_float,
                                      &queryfile,
-                                     &poolmask,
+                                     &poolmask_obj,
                                      &pbar,
                                      &pverb,
 				     &phead)) {
          return NULL  ;
     }
 
+
+
     // Conversion to boolean C variable
     lpbar    = PyObj_ToBool ( pbar  , lpbar     );
     verbose  = PyObj_ToBool ( pverb , verbose   );
     lheader  = PyObj_ToBool ( phead , lheader   );
 
+     // Convert to string
+    const char *poolmask_str = NULL;
+    if (poolmask_obj != Py_None) {
+        if (!PyUnicode_Check(poolmask_obj)) {
+         PyErr_SetString(PyExc_TypeError, "poolmask must be a string.  ex: '1 2 3 N' or '1:N' N=Number of pools'  \n") ;
+         return NULL;
+         }
+     poolmask_str  = PyUnicode_AsUTF8(poolmask_obj);
+    }
+
 
     // Estimate number of rows                      
-    int total_rows = getMaxrows(database, sql_query);
+    int total_rows = getMaxrows(database, sql_query, poolmask_str );
     
     // Progress bar 
     size_t prog_max = 0 ;
@@ -84,12 +95,16 @@ static PyObject * odbArray_method(PyObject *Py_UNUSED(self), PyObject *args, PyO
     }
 
 
+    if (verbose && poolmask_str ) {
+        printf("Fetch data from pool(s) #: %s\n", poolmask_str );
+    }
+
     // Open ODB                                         
     int maxcols = 0;
     void *h = odbdump_open(database,
                            sql_query,
                            NULL,
-                           poolmask,
+                           poolmask_str,
                            NULL,
                            &maxcols);
 

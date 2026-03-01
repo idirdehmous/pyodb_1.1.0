@@ -154,6 +154,3 @@ class OdbEnv:
           """
           return { k: v for k, v in os.environ.items()            if k.startswith("ODB_")  }
 
-
-env= OdbEnv()  
-env.Init()  

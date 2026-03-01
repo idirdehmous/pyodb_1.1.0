@@ -12,10 +12,11 @@
  */
 
 
-static int getMaxrows(const char* database, const char* sql_query)
+static int getMaxrows(const char* database , 
+		      const char* sql_query, 
+		      const char* poolmask )
 {
     void *h        = NULL;
-    char *poolmask = NULL;
     int maxcols    = 0;
     int nrows      = 0;
 

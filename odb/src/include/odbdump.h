@@ -7,6 +7,7 @@
 
 /* from aux/odbdump.c */
 
+
 extern void odbdump_reset_stderr(FILE *fp, const char *filename, const char *mode);
 
 extern void *odbdump_open(const char *database,

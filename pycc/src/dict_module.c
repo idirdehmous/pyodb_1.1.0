@@ -29,9 +29,11 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
     char *sql_query = NULL;
     int   fcols     = 0;
     char *queryfile = NULL;
-    char *poolmask  = NULL;
+    //char *poolmask  = NULL;
     int   fmt_float = 15  ;
 
+    // Objects 
+    PyObject *poolmask_obj = Py_None;
 
     // Options (Boolean args )
     PyObject *pbar  = Py_None;
@@ -48,25 +50,40 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
                              };
 
     // Parse keyword args 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ssi|izzOO", kwlist,   // 3 requiered , 5 optional 
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ssi|izOOO", kwlist,   // 3 requiered , 5 optional 
                                      &database,
                                      &sql_query,
                                      &fcols    ,
                                      &fmt_float,
                                      &queryfile,
-                                     &poolmask,
+                                     &poolmask_obj,
                                      &pbar,
                                      &pverb)) {
 	 return NULL  ;
     }
+
+    // Convert to string  
+    const char *poolmask_str = NULL;
+    if (poolmask_obj != Py_None) {
+        if (!PyUnicode_Check(poolmask_obj)) {
+         PyErr_SetString(PyExc_TypeError, "poolmask must be a string.  ex: '1 2 3 N' or '1:N' N=Number of pools'  \n") ;  
+         return NULL;
+         }
+     poolmask_str  = PyUnicode_AsUTF8(poolmask_obj);
+    }
+    
     // Conversion to boolean C variable
     lpbar   = PyObj_ToBool ( pbar , lpbar      ) ; 
     verbose = PyObj_ToBool ( pverb , verbose   ) ; 
 
 
-    if (verbose && poolmask) {
-        printf("Fetch data from pool # %s\n", poolmask);
+
+
+
+    if (verbose && poolmask_str ) {
+        printf("Fetch data from pool(s) #: %s\n", poolmask_str );
     }
+    
     char  *varvalue = NULL;
     int    maxlines = -1;
     void  *h        = NULL;
@@ -77,8 +94,10 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
     int    row_idx  = 0 ;
     int   nci       = 0;
     Bool print_mdi  = true ; 
+
+
     // Get maximum number of rows 
-    int total_rows = getMaxrows(database, sql_query );
+    int total_rows = getMaxrows(database, sql_query , poolmask_str);
 
     // Check number of rows --> check the query answer 
     if ( total_rows ==0 ) {
@@ -107,7 +126,7 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
             printf("Executing query from file   : %s\n", queryfile);
     }
     //  OPEN ODB
-    h = odbdump_open(database, sql_query, queryfile, poolmask, varvalue, &maxcols);
+    h = odbdump_open(database, sql_query, queryfile, poolmask_str , varvalue, &maxcols);
     
     if (!h || maxcols <= 0) {
         PyErr_SetString(PyExc_RuntimeError, "--odb4py : Failed to open ODB or invalid number of columns");
@@ -141,6 +160,7 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
 	PyErr_SetString(PyExc_RuntimeError, "--odb4py : PyObject memory allocation error");  
 	return NULL  ;
    }
+
    // Dict object 
    PyObject  *dict = PyDict_New();
    if (!dict) {
@@ -148,10 +168,12 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
        return NULL  ; 
     }
 
+
    // Init buffer strings 
    for (int i = 0; i < ncols; ++i) {
     strbufs[i] = (char*)calloc((size_t)total_rows, (size_t)ODB_STRLEN +1);
     }
+
 
     // Init columns lists 
     for (int i = 0; i < ncols; ++i) {
@@ -160,6 +182,7 @@ static PyObject *odbDict_method(PyObject *Py_UNUSED(self),
             PyErr_SetString(PyExc_RuntimeError, "--odb4py : PyObject memory allocation error");
              return NULL  ; 
         } }
+
     // Loop over the rows    
     while ((nd = nextrow(h, d, dlen, &new_dataset)) > 0) {
         if (lpbar) {  ++ip;            print_progress(ip, prog_max); }   // useful for huge ODBs 

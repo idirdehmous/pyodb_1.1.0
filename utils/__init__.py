@@ -10,4 +10,13 @@ from  .odb_ob        import OdbObject
 from  .odb_glossary  import OdbLexic 
 from  .setting_env   import OdbEnv  
 
+
 __all__=[ "StringParser", "OdbObject" , "OdbLexic", "OdbEnv" ]
+
+
+# Init once 
+if not globals().get("_ODB_ENV_INITIALIZED", False):
+    _env = OdbEnv()
+    _env.Init()
+    _ODB_ENV_INITIALIZED = True
+

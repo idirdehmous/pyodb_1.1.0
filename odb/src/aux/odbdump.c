@@ -7,7 +7,6 @@
 #include "odbdump.h"
 #include "pcma_extern.h"
 
-#define II  1000
 
 
 
@@ -52,13 +51,10 @@ PRIVATE FILE *f_stderr = NULL; /* not thread safe */
   @param filename     Filename where stderr will be redirected
   @param mode         Opening mode ("w" by default)
  */
-PUBLIC void odbdump_reset_stderr(FILE *fp, const char *filename, const char *mode)
+PUBLIC void
+odbdump_reset_stderr(FILE *fp, const char *filename, const char *mode)
 {
-  /*  In the context of odb4py  this function is switched 
-   *  otherwise ,user can see the python stderr on the screen 
-   *  can lead to some mis interpretation of the scripts outputs 
-   *
-   * if (!f_stderr) {
+/*  if (!f_stderr) {
     /* Get rid of unnecessary stderr-output by
        redirecting "stderr" to the filename (or /dev/null if cannot open).
        Do only once 
@@ -67,8 +63,9 @@ PUBLIC void odbdump_reset_stderr(FILE *fp, const char *filename, const char *mod
     if (!mode) mode = "w";
     f_stderr = freopen(filename, mode, fp);
     if (!f_stderr) f_stderr = freopen("/dev/null", mode, fp);
-     }*/
-    (void) 0 ;
+  }*/
+	// print ereything on stdout    else , even python stderr is redirected  (lazy solution !!:())
+	(void) 0 ; 
 }
 
 
@@ -111,7 +108,6 @@ SlurpMe(const char *path) /* Nearly as in odb/compiler/odb98.c */
 }
 
 
-
 /*!
   Open and initialise an existing ODB database.
   @param database  path of an existing ODB database (default .) 
@@ -124,6 +120,9 @@ SlurpMe(const char *path) /* Nearly as in odb/compiler/odb98.c */
  */
 
 
+
+
+
 PUBLIC void *
 odbdump_open(const char *database,
 	     const char *sql_query, /* Precedence on this over the queryfile, if both present */
@@ -132,6 +131,9 @@ odbdump_open(const char *database,
 	     const char *varvalue,
 	     int *ncols)
 {
+
+
+
   static Bool do_once = true; /* Not thread safe */
   odbdump_t *h = NULL;
   if (ncols) *ncols = 0;
@@ -394,11 +396,9 @@ odbdump_nextrow(void *Handle,
 	}
 
 	h->currow = ++currow;
-   
 	rc = nd;
       }
     } /* h->r */
-   
   }
  finish:
   return rc;
@@ -499,3 +499,5 @@ odbdump_close(void *Handle)
   }
   return rc;
 }
+
+

@@ -76,7 +76,7 @@ class OdbEnv:
       def __init__(self):
           pass 
 
-      def InitEnv(self ):
+      def Init(self ):
           if os.path.isdir (libdir):
              lib=CDLL ("/".join(    (libdir, libname)    ))
 
@@ -153,3 +153,7 @@ class OdbEnv:
           Return all currently defined ODB_* environment variables.
           """
           return { k: v for k, v in os.environ.items()            if k.startswith("ODB_")  }
+
+
+env= OdbEnv()  
+env.Init()  

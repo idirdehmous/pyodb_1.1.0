@@ -255,14 +255,14 @@ static PyObject *odbGeopoints_method(PyObject *Py_UNUSED(self) , PyObject *args,
     lpbar   = PyObj_ToBool ( pbar , lpbar      ) ;
     verbose = PyObj_ToBool ( pverb , verbose   ) ;
 
-     // Convert to string
-    const char *poolmask_str = NULL;
+   
+    //  const char *poolmask_str = NULL;
     if (poolmask_obj != Py_None) {
         if (!PyUnicode_Check(poolmask_obj)) {
          PyErr_SetString(PyExc_TypeError, "poolmask must be a string.  ex: '1 2 3 N' or '1:N' N=Number of pools'  \n") ;
          return NULL;
          }
-     poolmask_str  = PyUnicode_AsUTF8(poolmask_obj);
+     //poolmask_str  = PyUnicode_AsUTF8(poolmask_obj);
     }
 
 
